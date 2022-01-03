@@ -1,0 +1,23 @@
+
+`	java:S112?"FDefine and throw a dedicated exception instead of using a generic one.(Ô¦Šûÿÿÿÿ
+`	java:S112A"FDefine and throw a dedicated exception instead of using a generic one.(Ø‰ÅÓıÿÿÿÿ
+Q	java:S125E"<This block of commented-out lines of code should be removed.(Ê§…ñ
+A
+java:S1481Z"+Remove this unused "server" local variable.(Óè İ
+O
+java:S2864c"4Iterate over the "entrySet" instead of the "keySet".(ŞÍÌ–üÿÿÿÿ
+A
+java:S1481h"+Remove this unused "server" local variable.(Óè İ
+S	java:S106u"9Replace this use of System.out or System.err by a logger.(³Æìáüÿÿÿÿ
+M	java:S106|"9Replace this use of System.out or System.err by a logger.( £Ço
+[	java:S106‚"9Replace this use of System.out or System.err by a logger.(¼ıœşÿÿÿÿ8Ê†Íşá/
+R
+java:S1128"0Remove this unused import 'java.io.IOException'.(ªº»Úıÿÿÿÿ8¡½Èşá/
+S
+java:S1128"1Remove this unused import 'java.io.OutputStream'.(Ó ³ÿÿÿÿÿ8¢½Èşá/
+V
+java:S1128"9Remove this unused import 'dslab.mailbox.IMailboxServer'.(Ø–Úâ8£½Èşá/
+:
+java:S1643§"Use a StringBuilder instead.(Ùà÷ò8Ö†Íşá/
+:
+java:S1643Ô"Use a StringBuilder instead.(Ùà÷ò8Ö†Íşá/

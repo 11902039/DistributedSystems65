@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.transfer.TransferServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-01-03T09:47:09" hostname="ACERNB-SONJA" time="3.02">
+  <properties/>
+  <testcase name="runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly" classname="dslab.transfer.TransferServerTest" time="3.02"/>
+  <system-out><![CDATA[SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Socket is closed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:47:09 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Starting thread with component dslab.transfer.TransferServer@46207b3f
+Jän. 03, 2022 10:47:09 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Waiting for socket to open on port 12180
+Jän. 03, 2022 10:47:09 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Shutting down component dslab.transfer.TransferServer@46207b3f
+Jän. 03, 2022 10:47:12 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Waiting for thread to stop for component dslab.transfer.TransferServer@46207b3f
+]]></system-err>
+</testsuite>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.mailbox.MailboxServerProtocolTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2022-01-03T09:45:26" hostname="ACERNB-SONJA" time="14.479">
+  <properties/>
+  <testcase name="acceptDmtpMessage_listDmapMessage" classname="dslab.mailbox.MailboxServerProtocolTest" time="4.131"/>
+  <testcase name="loginAndLogout_withValidLogin" classname="dslab.mailbox.MailboxServerProtocolTest" time="3.668"/>
+  <testcase name="dmtpMessage_withUnknownRecipient_returnsError" classname="dslab.mailbox.MailboxServerProtocolTest" time="3.051"/>
+  <testcase name="login_withInvalidLogin_returnsError" classname="dslab.mailbox.MailboxServerProtocolTest" time="3.626"/>
+  <system-out><![CDATA[SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:45:26 VORM. dslab.mailbox.MailboxServerProtocolTest setUp
+INFO: Waiting for server sockets to appear
+Jän. 03, 2022 10:45:30 VORM. dslab.mailbox.MailboxServerProtocolTest setUp
+INFO: Waiting for server sockets to appear
+Jän. 03, 2022 10:45:33 VORM. dslab.mailbox.MailboxServerProtocolTest setUp
+INFO: Waiting for server sockets to appear
+Jän. 03, 2022 10:45:36 VORM. dslab.mailbox.MailboxServerProtocolTest setUp
+INFO: Waiting for server sockets to appear
+]]></system-err>
+</testsuite>

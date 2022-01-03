@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.mailbox.MailboxServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-01-03T09:45:40" hostname="ACERNB-SONJA" time="3.627">
+  <properties/>
+  <testcase name="runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly" classname="dslab.mailbox.MailboxServerTest" time="3.627"/>
+  <system-out><![CDATA[SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Socket is closed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:45:40 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Starting thread with component dslab.mailbox.MailboxServer@639b3d8e
+Jän. 03, 2022 10:45:40 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Waiting for DMTP socket to open on port 12182
+Jän. 03, 2022 10:45:41 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Waiting for DMAP socket to open on port 12183
+Jän. 03, 2022 10:45:41 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Shutting down component dslab.mailbox.MailboxServer@639b3d8e
+Jän. 03, 2022 10:45:44 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly
+INFO: Waiting for thread to stop for component dslab.mailbox.MailboxServer@639b3d8e
+]]></system-err>
+</testsuite>

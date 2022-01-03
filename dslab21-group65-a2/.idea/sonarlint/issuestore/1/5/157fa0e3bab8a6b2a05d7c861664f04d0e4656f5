@@ -1,0 +1,7 @@
+
+b	java:S1126"FDefine and throw a dedicated exception instead of using a generic one.(ö­8›ëÿùá/
+V
+java:S2864>"4Iterate over the "entrySet" instead of the "keySet".(İş‚‡úÿÿÿÿ8üŞ€úá/
+Q
+java:S2864F"4Iterate over the "entrySet" instead of the "keySet".(‡İ¥‹8ÿŞ€úá/
+N	java:S106f"9Replace this use of System.out or System.err by a logger.(¨»Ûİ

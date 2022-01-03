@@ -1,0 +1,21 @@
+
+h
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(“–ış
+g
+java:S2677%"LUse or store the value returned from "readLine" instead of throwing it away.(××±ûûÿÿÿÿ
+g
+java:S2677*"LUse or store the value returned from "readLine" instead of throwing it away.(××±ûûÿÿÿÿ
+g
+java:S2677/"LUse or store the value returned from "readLine" instead of throwing it away.(××±ûûÿÿÿÿ
+g
+java:S26774"LUse or store the value returned from "readLine" instead of throwing it away.(××±ûûÿÿÿÿ
+U
+java:S1117[":Rename "server" which hides the field declared at line 15.(üóü£ûÿÿÿÿ
+S	java:S106d"9Replace this use of System.out or System.err by a logger.(¿¥â×şÿÿÿÿ
+N	java:S106f"9Replace this use of System.out or System.err by a logger.(”üì
+E
+java:S2093"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ
+7
+java:S1643:"Use a StringBuilder instead.(ÙÍÖåûÿÿÿÿ
+7
+java:S1643Q"Use a StringBuilder instead.(ƒÛ‚‘şÿÿÿÿ

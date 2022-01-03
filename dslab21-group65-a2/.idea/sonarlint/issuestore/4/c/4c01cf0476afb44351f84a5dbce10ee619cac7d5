@@ -1,0 +1,20 @@
+
+v	java:S116 "URename this field "ThreadPool" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚‡¹‘şÿÿÿÿ8Ôº‰úá/
+|
+java:S1450""ZRemove the "shellthread" field and declare it as a local variable in the relevant methods.(±•–úÿÿÿÿ8Åúá/
+o
+java:S3776;"RRefactor this method to reduce its Cognitive Complexity from 52 to the 15 allowed.(“–ış8•Åúá/
+{
+java:S2142P"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(ä ¹€8™Åúá/
+4
+java:S2438e""t" is a "Thread".(½¥¬‘üÿÿÿÿ8£Åúá/
+[	java:S106—"9Replace this use of System.out or System.err by a logger.(ò÷Öùÿÿÿÿ8¤Åúá/
+[	java:S106"9Replace this use of System.out or System.err by a logger.(Í«Ê¯ıÿÿÿÿ8¨Åúá/
+[	java:S106¬"9Replace this use of System.out or System.err by a logger.(¿¥â×şÿÿÿÿ8ÆÅúá/
+[	java:S106®"9Replace this use of System.out or System.err by a logger.(©Ú„Üıÿÿÿÿ8ÇÅúá/
+|
+java:S2142·"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(ä ¹€8ÇÅúá/
+e
+java:S1192m"HDefine a constant instead of duplicating this literal "mailer@" 3 times.(°³Éº8ÇÅúá/
+>
+java:S1643u"Use a StringBuilder instead.(îçÓ¬şÿÿÿÿ8ÕÅúá/

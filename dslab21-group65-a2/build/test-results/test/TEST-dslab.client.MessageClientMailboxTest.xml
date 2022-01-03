@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.client.MessageClientMailboxTest" tests="2" skipped="0" failures="2" errors="0" timestamp="2022-01-03T09:44:03" hostname="ACERNB-SONJA" time="67.356">
+  <properties/>
+  <testcase name="inbox_mulipleMails_showsAllInboxDataCorrectly" classname="dslab.client.MessageClientMailboxTest" time="43.639">
+    <failure message="org.junit.runners.model.TestTimedOutException: test timed out after 40000 milliseconds" type="org.junit.runners.model.TestTimedOutException">org.junit.runners.model.TestTimedOutException: test timed out after 40000 milliseconds
+	at java.base@11.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+	at java.base@11.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:234)
+	at java.base@11.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2123)
+	at java.base@11.0.2/java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:458)
+	at app//dslab.StreamListener.poll(StreamListener.java:34)
+	at app//dslab.JunitSocketClient.read(JunitSocketClient.java:82)
+	at app//dslab.JunitSocketClient.sendAndRead(JunitSocketClient.java:108)
+	at app//dslab.JunitSocketClient.sendAndVerify(JunitSocketClient.java:103)
+	at app//dslab.client.MessageClientMailboxTest.inbox_mulipleMails_showsAllInboxDataCorrectly(MessageClientMailboxTest.java:121)
+	at java.base@11.0.2/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@11.0.2/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base@11.0.2/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@11.0.2/java.lang.reflect.Method.invoke(Method.java:566)
+	at app//org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at app//org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at app//org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at app//org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at app//org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:298)
+	at app//org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:292)
+	at java.base@11.0.2/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base@11.0.2/java.lang.Thread.run(Thread.java:834)
+</failure>
+  </testcase>
+  <testcase name="inbox_singleMail_showsAllInboxDataCorrectly" classname="dslab.client.MessageClientMailboxTest" time="23.716">
+    <failure message="org.junit.runners.model.TestTimedOutException: test timed out after 20000 milliseconds" type="org.junit.runners.model.TestTimedOutException">org.junit.runners.model.TestTimedOutException: test timed out after 20000 milliseconds
+	at java.base@11.0.2/jdk.internal.misc.Unsafe.park(Native Method)
+	at java.base@11.0.2/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:234)
+	at java.base@11.0.2/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2123)
+	at java.base@11.0.2/java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:458)
+	at app//dslab.StreamListener.poll(StreamListener.java:34)
+	at app//dslab.JunitSocketClient.read(JunitSocketClient.java:82)
+	at app//dslab.JunitSocketClient.sendAndRead(JunitSocketClient.java:108)
+	at app//dslab.JunitSocketClient.sendAndVerify(JunitSocketClient.java:103)
+	at app//dslab.client.MessageClientMailboxTest.inbox_singleMail_showsAllInboxDataCorrectly(MessageClientMailboxTest.java:92)
+	at java.base@11.0.2/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base@11.0.2/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base@11.0.2/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base@11.0.2/java.lang.reflect.Method.invoke(Method.java:566)
+	at app//org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at app//org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at app//org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at app//org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at app//org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:298)
+	at app//org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:292)
+	at java.base@11.0.2/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base@11.0.2/java.lang.Thread.run(Thread.java:834)
+</failure>
+  </testcase>
+  <system-out><![CDATA[SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Interrupted function call: accept failed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:44:03 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Creating mailbox server
+Jän. 03, 2022 10:44:03 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Waiting for mailbox server sockets
+Jän. 03, 2022 10:44:03 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Starting message client
+Jän. 03, 2022 10:44:46 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Creating mailbox server
+Jän. 03, 2022 10:44:46 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Waiting for mailbox server sockets
+Jän. 03, 2022 10:44:47 VORM. dslab.client.MessageClientMailboxTest setUp
+INFO: Starting message client
+]]></system-err>
+</testsuite>

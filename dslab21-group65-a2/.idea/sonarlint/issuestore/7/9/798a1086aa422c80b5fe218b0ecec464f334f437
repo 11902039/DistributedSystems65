@@ -1,0 +1,11 @@
+
+g
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 73 to the 15 allowed.(”“Ô
+7	java:S131 ""Add a default case to this switch.(þ™ÅÞ
+<	java:S1316""Add a default case to this switch.(›æ·Ëýÿÿÿÿ
+Q
+java:S1117s";Rename "message" which hides the field declared at line 23.(ƒ´ú
+8	java:S131¤""Add a default case to this switch.(™Ïêƒ
+8
+java:S1643©"Use a StringBuilder instead.(ÖÊæüÿÿÿÿ
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(³«×¿

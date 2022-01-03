@@ -1,0 +1,13 @@
+
+d	java:S116"ORename this field "DMTP" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ÿ›¶Œ
+o	java:S116"URename this field "ThreadPool" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚‡¹‘şÿÿÿÿ
+1
+java:S36261"Remove this redundant jump.(ûÁİ…
+-
+java:S2438-""t" is a "Thread".(½¥¬‘üÿÿÿÿ
+N	java:S1060"9Replace this use of System.out or System.err by a logger.(”üì
+W
+java:S1126@"AReplace this if-then-else statement by a single return statement.(‚Âàæ
+k	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ıë·ºşÿÿÿÿ
+q
+java:S1488X"\Immediately return this expression instead of assigning it to the temporary variable "msgs".(¬¿ì6

@@ -1,0 +1,6 @@
+
+o	java:S116"URename this field "ThreadPool" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚‡¹‘þÿÿÿÿ
+M
+java:S1068	"2Remove this unused "transferServer" private field.(ÑÙ¾‹ýÿÿÿÿ
+I
+java:S1068".Remove this unused "ThreadPool" private field.(‚‡¹‘þÿÿÿÿ

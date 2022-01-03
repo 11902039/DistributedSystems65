@@ -1,0 +1,20 @@
+
+Z	java:S106^"9Replace this use of System.out or System.err by a logger.(ò÷Öùÿÿÿÿ8á˜ëùá/
+Z	java:S106d"9Replace this use of System.out or System.err by a logger.(ò÷Öùÿÿÿÿ8æ˜ëùá/
+S	java:S106j"9Replace this use of System.out or System.err by a logger.(ÓåÔ–şÿÿÿÿ
+F
+java:S2140”")Use "java.util.Random.nextInt()" instead.(Ó¿¼g8õ˜ëùá/
+F
+java:S1905”")Remove this unnecessary cast to "double".(Ó¿¼g8ö˜ëùá/
+L
+java:S2140˜")Use "java.util.Random.nextInt()" instead.(„ìˆüÿÿÿÿ8÷˜ëùá/
+L
+java:S1905˜")Remove this unnecessary cast to "double".(„ìˆüÿÿÿÿ8ú˜ëùá/
+]
+java:S1117¤":Rename "domain" which hides the field declared at line 29.(º‰Ãûÿÿÿÿ8ı˜ëùá/
+_
+java:S1117Ô"<Rename "messages" which hides the field declared at line 34.(æÀ€Ïşÿÿÿÿ8™ëùá/
+B
+java:S1168Ü"$Return an empty map instead of null.(¥¹ï8Üö¶üá/
+‹
+java:S1319Ó"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(±Ïº¤8ëö¶üá/

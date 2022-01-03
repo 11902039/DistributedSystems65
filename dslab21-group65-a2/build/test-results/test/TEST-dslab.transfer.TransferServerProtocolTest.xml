@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.transfer.TransferServerProtocolTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2022-01-03T09:47:02" hostname="ACERNB-SONJA" time="6.119">
+  <properties/>
+  <testcase name="defaultDmtpInteractionTest" classname="dslab.transfer.TransferServerProtocolTest" time="3.082"/>
+  <testcase name="sendWithoutRecipient_returnsErrorOnSend" classname="dslab.transfer.TransferServerProtocolTest" time="3.036"/>
+  <system-out><![CDATA[SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+SocketException while handling socket: Software caused connection abort: recv failed
+SocketException while handling socket: Interrupted function call: accept failed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:47:02 VORM. dslab.transfer.TransferServerProtocolTest setUp
+INFO: Waiting for server socket to appear
+java.net.ConnectException: Connection refused: connect
+	at java.base/java.net.PlainSocketImpl.connect0(Native Method)
+	at java.base/java.net.PlainSocketImpl.socketConnect(PlainSocketImpl.java:101)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at dslab.transfer.TransferServer.run(TransferServer.java:100)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+Jän. 03, 2022 10:47:06 VORM. dslab.transfer.TransferServerProtocolTest setUp
+INFO: Waiting for server socket to appear
+]]></system-err>
+</testsuite>

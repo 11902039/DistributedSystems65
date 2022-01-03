@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dslab.monitoring.MonitoringServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-01-03T09:46:10" hostname="ACERNB-SONJA" time="6.037">
+  <properties/>
+  <testcase name="runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly" classname="dslab.monitoring.MonitoringServerTest" time="6.037"/>
+  <system-out><![CDATA[SocketException while waiting for/handling packets: socket closed
+]]></system-out>
+  <system-err><![CDATA[Jän. 03, 2022 10:46:10 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly
+INFO: Starting thread with component dslab.monitoring.MonitoringServer@5c907aec
+Jän. 03, 2022 10:46:13 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly
+INFO: Trying to create socket on port 12188
+Jän. 03, 2022 10:46:13 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly
+INFO: Shutting down component dslab.monitoring.MonitoringServer@5c907aec
+Jän. 03, 2022 10:46:16 VORM. dslab.monitoring.MonitoringServerTest runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly
+INFO: Waiting for thread to stop for component dslab.monitoring.MonitoringServer@5c907aec
+]]></system-err>
+</testsuite>

@@ -1,0 +1,26 @@
+
+`	java:S112'"FDefine and throw a dedicated exception instead of using a generic one.(èİÎÑşÿÿÿÿ
+`	java:S1129"FDefine and throw a dedicated exception instead of using a generic one.(èİÎÑşÿÿÿÿ
+`	java:S112K"FDefine and throw a dedicated exception instead of using a generic one.(èİÎÑşÿÿÿÿ
+`	java:S112]"FDefine and throw a dedicated exception instead of using a generic one.(èİÎÑşÿÿÿÿ
+`	java:S112o"FDefine and throw a dedicated exception instead of using a generic one.(èİÎÑşÿÿÿÿ
+
+java:S1130'"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(èİÎÑşÿÿÿÿ8­»Ïúá/
+H
+java:S1135)"2Complete the task associated to this TODO comment.(°ÎÜÚ
+
+java:S11309"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(èİÎÑşÿÿÿÿ8ÿ»Ïúá/
+H
+java:S1135;"2Complete the task associated to this TODO comment.(°ÎÜÚ
+
+java:S1130K"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(èİÎÑşÿÿÿÿ8«¼Ïúá/
+H
+java:S1135M"2Complete the task associated to this TODO comment.(°ÎÜÚ
+
+java:S1130]"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(èİÎÑşÿÿÿÿ8Ä¼Ïúá/
+H
+java:S1135_"2Complete the task associated to this TODO comment.(°ÎÜÚ
+
+java:S1130o"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(èİÎÑşÿÿÿÿ8Ø¼Ïúá/
+H
+java:S1135q"2Complete the task associated to this TODO comment.(°ÎÜÚ
