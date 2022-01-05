@@ -1,5 +1,7 @@
 package dslab.client;
 
+import java.io.IOException;
+
 /**
  * A Message Client application.
  *
@@ -46,5 +48,5 @@ public interface IMessageClient extends Runnable {
     /**
      * Shuts down the application.
      */
-    void shutdown();
+    void shutdown() throws IOException;
 }
