@@ -26,7 +26,7 @@ public interface IMessageClient extends Runnable {
      *
      * @param id the mail id
      */
-    void delete(String id);
+    void delete(String id) throws IOException;
 
     /**
      * Verifies the signature of the message by calculating its hash value using the shared secret. Prints 'ok' if the
