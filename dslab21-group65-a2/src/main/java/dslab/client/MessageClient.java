@@ -9,6 +9,7 @@ import at.ac.tuwien.dsg.orvell.StopShellException;
 import dslab.ComponentFactory;
 import dslab.util.Config;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 
 
 public class MessageClient implements IMessageClient, Runnable {
@@ -56,7 +57,7 @@ public class MessageClient implements IMessageClient, Runnable {
             DMAPSocket = new Socket(config.getString("mailbox.host"), config.getInt("mailbox.port"));
             reader = new BufferedReader(new InputStreamReader(DMAPSocket.getInputStream()));
             writer = new PrintWriter(DMAPSocket.getOutputStream());
-
+            shell.run();
             while ((answer = reader.readLine()) != null) {
                 shell.out().println(answer);
                 String[] parts = answer.split("\\s");
@@ -95,8 +96,8 @@ public class MessageClient implements IMessageClient, Runnable {
                 }
             }
 
-            System.out.println("Client is up!");
-            shell.run();
+            shell.out().println("Client is up!");
+
 
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
@@ -107,6 +108,29 @@ public class MessageClient implements IMessageClient, Runnable {
 
     @Override
     public void inbox() {
+        String answer;
+        ArrayList<String> ids = new ArrayList<>();
+        writer.println("list");
+        try {
+            while (!(answer = reader.readLine()).equals("ok")) {
+                String[] parts = answer.split("\\s");
+                ids.add(parts[0]);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
+        }
+        for (String id : ids) {
+            shell.out().println("message no. " + id);
+            writer.println("show " + id);
+            try {
+                while (!(answer = reader.readLine()).equals("ok")) {
+                    shell.out().println(answer);
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
+            }
+        }
+        writer.println("");
 
     }
 
@@ -125,12 +149,32 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     public void verify(String id) {
         String answer;
+        StringBuilder messageBuilder = new StringBuilder(100);
         writer.println("show " + id);
         try {
-            while ((answer = reader.readLine()) != null) {
-                shell.out().println(answer);
-                String[] parts = answer.split("\\n");
-                // to be finished
+            while (!(answer = reader.readLine()).equals("ok")) {
+                String[] parts = answer.split("\\s");
+                if(answer.startsWith("data")) {
+                    for (int i = 1; i < parts.length; i++) {
+                        messageBuilder.append(parts[i]);
+                        if(i + 1 != parts.length) {
+                            messageBuilder.append(" ");
+                        }
+                    }
+                }
+                if(answer.startsWith("hash"))
+                {
+                    /*
+                    TODO: implement the hash function
+                   if(parts[1].equals(hash(messageBuilder.toString())))
+                    {
+                        shell.out().println("ok");
+                    }
+                    else {
+                       shell.out().println("error");
+                   }
+                     */
+                }
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Error while using show ", e);
