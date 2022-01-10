@@ -9,13 +9,15 @@ import java.util.Locale;
 
 public class DMAP {
 
+    private static final int PLAIN = -1;
+    private static final int RSAENCRYPTED = -2;
     private static final int LOGGEDOUT = 0;
     private static final int LOGGEDIN = 1;
 
     private static final int SHOWING = 2;
     private static final int LISTING = 3;
 
-    private int state = LOGGEDOUT;
+    private int state = PLAIN;
     private String user;
     private dmapThread thread;
 
@@ -26,11 +28,26 @@ public class DMAP {
         this.thread = thread;
     }
 
+    public String AESEncryptStub(String message)
+    {
+        return message;
+    }
+
+    public String AESDecryptStub(String message)
+    {
+        return message;
+    }
+
+    public String RSADecrypt(String message)
+    {
+        return message;
+    }
+
     public String processInput(String input){
         String output = "";
 
         switch(state){
-            case LOGGEDOUT:
+            case PLAIN:
                 if(input == null)
                     output = "ok DMAP2.0";
                 else {
@@ -40,8 +57,54 @@ public class DMAP {
                     if(splitInput.length > 1)
                         newInput = splitInput[0];
                     switch(newInput.toLowerCase(Locale.ROOT)){
+                        case "startsecure":
+                            output = "ok " + thread.getId();
+                            state = RSAENCRYPTED;
+                            break;
+                        default:
+                            output = "error protocol error";
+                            break;
+                    }
+                }
+            break;
+            case RSAENCRYPTED:
+                input = RSADecrypt(input);
+                String newInput = input;
+                String[] splitInput = input.split("\\s");
+
+                if(splitInput.length > 1)
+                    newInput = splitInput[0];
+                switch(newInput.toLowerCase(Locale.ROOT)){
+                    case "ok":
+                        if(splitInput.length == 1)
+                        {
+                            state = LOGGEDOUT;
+                            break;
+                        }
+                        else if(splitInput.length < 4)
+                        {
+                            output = "error not enough data";
+                            break;
+                        }
+                         String clientChallenge = splitInput[1];
+                         String secretKey = splitInput[2];
+                         String iv = splitInput[2];
+                        output = RSADecrypt(clientChallenge);
+                        break;
+                    default:
+                        output = "error protocol error";
+                        break;
+                }
+            case LOGGEDOUT:
+                input = AESDecryptStub(input);
+                newInput = input;
+                splitInput = input.split("\\s");
+
+                    if(splitInput.length > 1)
+                        newInput = splitInput[0];
+                    switch(newInput.toLowerCase(Locale.ROOT)){
                         case "login":
-                            if(splitInput.length <3){
+                            if(splitInput.length < 3){
                                 output = "error not enough data";
                                 break;
                             }
@@ -79,12 +142,12 @@ public class DMAP {
                             output = "error protocol error";
                             break;
                     }
-                }
-            break;
+                    break;
             case LOGGEDIN:
                 if(input != null){
-                    String newInput = input;
-                    String[] splitInput = input.split("\\s");
+                    input = AESDecryptStub(input);
+                     newInput = input;
+                     splitInput = input.split("\\s");
 
                     if(splitInput.length > 1)
                         newInput = splitInput[0];
@@ -160,6 +223,7 @@ public class DMAP {
                 }
                 break;
             case SHOWING:
+                input = AESDecryptStub(input);
                 if(input != null) {
                     switch(input){
                         case "0":
@@ -181,6 +245,7 @@ public class DMAP {
                 }
                 break;
             case LISTING: //State, expects null answers from thread to keep listing mails
+                input = AESDecryptStub(input);
                 if (input == null){
                     if(!list.isEmpty()){
                        int id = list.keySet().iterator().next();
@@ -196,8 +261,10 @@ public class DMAP {
                 }
                 break;
         }
-
-        return output;
+        if(state != PLAIN)
+            return AESEncryptStub(output);
+        else
+            return output;
     }
 
 
