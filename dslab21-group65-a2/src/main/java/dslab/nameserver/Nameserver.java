@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -44,8 +45,13 @@ public class Nameserver implements INameserver, INameserverRemote {
         shell = new Shell(in, out);
         shell.register(this);
         shell.setPrompt(componentId + "---> ");
-        this.domain = config.getString("domain");
+        if(componentId.equals("ns-root")){
+            this.domain = null;
+        } else
+            this.domain = config.getString("domain");
         this.config = config;
+        this.childServers = new ConcurrentHashMap<>();
+        this.mailboxes = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -59,12 +65,30 @@ public class Nameserver implements INameserver, INameserverRemote {
                 // bind the obtained remote object on specified binding name in the registry
                 registry.bind(config.getString("root_id"), remote);
             }
+            else {
+                registry = LocateRegistry.getRegistry(config.getString("registry.host"), config.getInt("registry.port"));
+            }
         } catch (RemoteException e) {
             throw new RuntimeException("Error while starting server.", e);
         } catch (AlreadyBoundException e) {
             throw new RuntimeException("Error while binding remote object to registry.", e);
         }
 
+        if(this.domain != null) {
+            try {
+                INameserverRemote rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
+
+                rootNameServer.registerNameserver(this.domain,(INameserverRemote) UnicastRemoteObject.exportObject(this, 0));
+            } catch (NotBoundException e) {
+                throw new RuntimeException("Error while looking for server-remote-object.", e);
+            } catch (RemoteException e) {
+                throw new RuntimeException("Error while obtaining registry/server-remote-object.", e);
+            } catch (InvalidDomainException e) {
+                throw new RuntimeException(e.getMessage());
+            } catch (AlreadyRegisteredException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
         /* Comment??
         String name;
         if(domain == null){
@@ -82,6 +106,9 @@ public class Nameserver implements INameserver, INameserverRemote {
     @Command
     public void nameservers() {
         int counter = 1;
+        if(childServers.isEmpty())
+            shell.out().println("No child nameservers stored in this nameserver");
+
         for (String server: childServers.keySet()) {
             shell.out().println(counter + ". " + server);
             counter++;
@@ -96,6 +123,9 @@ public class Nameserver implements INameserver, INameserverRemote {
     @Command
     public void addresses() {
         int counter = 1;
+        if(mailboxes.isEmpty()){
+            shell.out().println("No addresses stored in this nameserver");
+        }
         for (String server: mailboxes.keySet()) {
             shell.out().println(counter + ". " + server + ":" + mailboxes.get(server));
             counter++;
@@ -139,13 +169,14 @@ public class Nameserver implements INameserver, INameserverRemote {
 
     @Override
     public String lookup(String username) throws RemoteException {
-        shell.out().println(LocalDate.now() + ": Address for Mailbox Server" + username + " requested by transfer server");
+        shell.out().println(LocalDate.now() + ": Address for Mailbox Server " + username + " requested by transfer server");
         return mailboxes.get(username);
     }
 
     @Override
     public void registerNameserver(String domain, INameserverRemote nameserver) throws RemoteException, AlreadyRegisteredException, InvalidDomainException {
-        String[] parts = domain.split(".");
+        System.out.println("Help");
+        String[] parts = domain.split("\\.");
 
         //still a dot in the domain
         if(parts.length > 1){
@@ -182,14 +213,17 @@ public class Nameserver implements INameserver, INameserverRemote {
 
         synchronized (this) {
             //save new child nameserver
-            this.shell.out().println(LocalDate.now() + ": Registering Nameserver " + domain + " for zone "+ this.domain);
+            if(this.domain == null)
+                this.shell.out().println(LocalDate.now() + ": Registering Nameserver " + domain + " for zone root-nameserver");
+            else
+                this.shell.out().println(LocalDate.now() + ": Registering Nameserver " + domain + " for zone "+ this.domain);
             this.childServers.put(domain, nameserver);
         }
     }
 
     @Override
     public void registerMailboxServer(String domain, String address) throws RemoteException, AlreadyRegisteredException, InvalidDomainException {
-        String[] parts = domain.split(".");
+        String[] parts = domain.split("\\.");
 
         //still a dot in the domain
         if(parts.length > 1){
@@ -217,22 +251,23 @@ public class Nameserver implements INameserver, INameserverRemote {
             }
             child.registerMailboxServer(restDomain,address);
         }
+        else {
+            //root nameserver case
+            if (this.domain == null) {
+                throw new InvalidDomainException("Registering in the root nameserver is not allowed!");
+            }
 
-        //root nameserver case
-        if (this.domain == null){
-            throw new InvalidDomainException("Registering in the root nameserver is not allowed!");
-        }
+            //mailbox already saved
+            if (this.mailboxes.get(domain) != null)
+                throw new AlreadyRegisteredException("The mailbox server " + domain + " already exists in the nameserver " + this.domain);
 
-        //mailbox already saved
-        if (this.mailboxes.get(domain)!= null)
-            throw new AlreadyRegisteredException("The mailbox server " + domain + "already exists in the nameserver " + this.domain);
+            synchronized (this) {
+                //save new mailbox server
 
-        synchronized (this) {
-            //save new mailbox server
+                this.shell.out().println(LocalDate.now() + ": Registering Mailbox Server " + domain + " for nameserver " + this.domain);
 
-            this.shell.out().println(LocalDate.now() + ": Registering Mailbox Server " + domain + " for nameserver "+ this.domain);
-
-            this.mailboxes.put(domain, address);
+                this.mailboxes.put(domain, address);
+            }
         }
     }
 }

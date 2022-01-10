@@ -5,6 +5,10 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.ServerSocket;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +21,9 @@ import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
 import dslab.Message.Message;
 import dslab.mailbox.tcp.ListenerThread;
+import dslab.nameserver.AlreadyRegisteredException;
+import dslab.nameserver.INameserverRemote;
+import dslab.nameserver.InvalidDomainException;
 import dslab.util.Config;
 
 public class MailboxServer implements IMailboxServer, Runnable {
@@ -28,6 +35,8 @@ public class MailboxServer implements IMailboxServer, Runnable {
     private ListenerThread dmapThread;
     private String domain;
     private Config userConfig;
+
+    private INameserverRemote rootNameServer;
 
     private Shell shell;
 
@@ -55,6 +64,16 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
     @Override
     public void run() {
+        try {
+            Registry registry = LocateRegistry.getRegistry(config.getString("registry.host"), config.getInt("registry.port"));
+
+            rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
+        } catch (RemoteException e) {
+            System.err.println(e.getMessage());
+        } catch (NotBoundException e) {
+            System.err.println(e.getMessage());
+        }
+
         Set<String> userlist = this.userConfig.listKeys();
         for (String user: userlist) {
             users.put(user,new LinkedList<>());
@@ -78,6 +97,18 @@ public class MailboxServer implements IMailboxServer, Runnable {
             throw new UncheckedIOException("Error while creating server socket", e);
         }
 
+
+        try {
+            if (rootNameServer != null) {
+                rootNameServer.registerMailboxServer(this.domain, this.serverSocketDMTP.getLocalSocketAddress().toString().split("/")[1]);
+            }
+        } catch (AlreadyRegisteredException e) {
+            System.err.println(e.getMessage());
+        } catch (InvalidDomainException e){
+            System.err.println(e.getMessage());
+        } catch (RemoteException e) {
+            System.err.println(e.getMessage());
+        }
 
         shell.run();
     }

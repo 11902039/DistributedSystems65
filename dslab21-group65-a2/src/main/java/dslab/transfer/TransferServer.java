@@ -5,6 +5,11 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.net.*;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.sql.SQLOutput;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +23,9 @@ import at.ac.tuwien.dsg.orvell.StopShellException;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
 import dslab.Message.Message;
+import dslab.nameserver.INameserverRemote;
+import dslab.nameserver.InvalidDomainException;
+import dslab.nameserver.Nameserver;
 import dslab.transfer.tcp.ClientThread;
 import dslab.transfer.tcp.TListenerThread;
 import dslab.util.Config;
@@ -33,6 +41,7 @@ public class TransferServer implements ITransferServer, Runnable {
     private TListenerThread thread;
     private ShellListenerThread shellthread;
     private DatagramSocket dataSocket;
+    private INameserverRemote rootNameServer;
 
     private Shell shell;
 
@@ -59,9 +68,18 @@ public class TransferServer implements ITransferServer, Runnable {
     public void run() {
 
         try {
+            Registry registry = LocateRegistry.getRegistry(config.getString("registry.host"), config.getInt("registry.port"));
+
+            rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
+        } catch (RemoteException e) {
+            System.err.println(e.getMessage());
+        } catch (NotBoundException e) {
+            System.err.println(e.getMessage());
+        }
+
+        try {
             this.dataSocket = new DatagramSocket();
             this.serverSocket = new ServerSocket(config.getInt("tcp.port"));
-
             this.thread = new TListenerThread(serverSocket, this);
             this.thread.start();
             this.shellthread = new ShellListenerThread(this.shell);
@@ -71,7 +89,6 @@ public class TransferServer implements ITransferServer, Runnable {
         }
 
         this.ThreadPool = Executors.newCachedThreadPool();
-
         while(active) { //constant checking for messages
             if (!messages.isEmpty()) {
                 Message msg = null;
@@ -86,23 +103,42 @@ public class TransferServer implements ITransferServer, Runnable {
                     Set<String> domains = new HashSet<>();
                     for (String rec : recips) { //check the domains, put into known and unknown (error) domains
                         String[] parts = rec.split("@");
-                        if (parts.length > 1 && this.domainConfig.containsKey(parts[1]))
+                        if (parts.length > 1)
                             domains.add(parts[1]);
-                        else
-                            errorDoms.add(rec);
                     }
-                    for (String dom : domains) { //create one thread for each known domain
+
+                    for (String dom : domains) { //lookup, create threads for each domain
+
+                        String[] domainParts = dom.split("\\.");
+
+                        INameserverRemote nsServer = rootNameServer;
                         String host = this.domainConfig.getString(dom);
 
-                        String port = host.split(":")[1];
-                        host = host.split(":")[0];
                         try {
-                            Thread t = new ClientThread(msg, this, new Socket(host, Integer.parseInt(port)));
-                            ThreadPool.submit(t);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            for (int i = domainParts.length-1; i > 0; i--) {
+                                if (nsServer != null)
+                                    nsServer = nsServer.getNameserver(domainParts[i]);
+                            }
+
+                            if (nsServer == null)
+                                errorDoms.add(dom);
+                            else
+                                host = nsServer.lookup(domainParts[0]);
+
+                        } catch (RemoteException e) {
+                            System.err.println("An error occurred while communicating with the server: " + e.getMessage());
                         }
 
+                        if(nsServer != null) {
+                            String port = host.split(":")[1];
+                            host = host.split(":")[0];
+                            try {
+                                Thread t = new ClientThread(msg, this, new Socket(host, Integer.parseInt(port)));
+                                ThreadPool.submit(t);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                     if (!errorDoms.isEmpty()){ //if there is an unknown domain, send error message
                         String ip = this.serverSocket.getInetAddress().getHostAddress() + ":" + this.serverSocket.getLocalPort();
