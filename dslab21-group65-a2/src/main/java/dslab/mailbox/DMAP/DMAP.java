@@ -38,7 +38,7 @@ public class DMAP {
         return message;
     }
 
-    public String RSADecrypt(String message)
+    public String RSADecryptStub(String message)
     {
         return message;
     }
@@ -68,7 +68,7 @@ public class DMAP {
                 }
             break;
             case RSAENCRYPTED:
-                input = RSADecrypt(input);
+                input = RSADecryptStub(input);
                 String newInput = input;
                 String[] splitInput = input.split("\\s");
 
@@ -89,7 +89,7 @@ public class DMAP {
                          String clientChallenge = splitInput[1];
                          String secretKey = splitInput[2];
                          String iv = splitInput[2];
-                        output = RSADecrypt(clientChallenge);
+                        output = clientChallenge;
                         break;
                     default:
                         output = "error protocol error";
@@ -238,6 +238,9 @@ public class DMAP {
                             break;
                         case "2":
                             output = "data " + message.getData();
+                            break;
+                        case "3":
+                            output = "hash " + message.getHash();
                             this.message = null;
                             this.state = LOGGEDIN;
                             break;

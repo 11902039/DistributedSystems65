@@ -8,6 +8,7 @@ public class Message {
     private String subject;
     private String data;
     private String sender;
+    private String hash;
     private List<String> recipients;
 
     public Message() {
@@ -18,9 +19,16 @@ public class Message {
         this.data = data;
     }
 
-    public String getData() {
-        return data;
+    public String getHash() {
+        if(hash == null)
+            return "";
+        else
+            return hash;
     }
+
+    public void  setHash(String hash) { this.hash = hash; }
+
+    public String getData() { return data; }
 
     public String getSender() {
         return sender;

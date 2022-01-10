@@ -59,9 +59,9 @@ public class dmapThread extends Thread{
                     writer.flush();
 
 
-                    //if output starts with from, send 0,1,2 for other lines
+                    //if output starts with from, send 0,1,2,3 for other lines
                     if (outputLine.startsWith("from"))
-                        for(int i = 0; i <= 2; i++){
+                        for(int i = 0; i <= 3; i++){
                             outputLine = protocol.processInput(Integer.toString(i));
                             writer.println(outputLine);
                             writer.flush();

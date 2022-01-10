@@ -108,7 +108,14 @@ public class DMTP {
                             from = true;
                             newMessage.setSender(input.substring(5));
                             break;
-
+                        case "hash":
+                            if (parts.length < 2){
+                                output = "error no hash given";
+                                break;
+                            }
+                            output = "ok";
+                            newMessage.setHash(input.substring(5));
+                            break;
                         case "to":
                             if (parts.length < 2){
                                 output = "error no recipients given";
