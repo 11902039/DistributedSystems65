@@ -76,8 +76,8 @@ public class MessageClient implements IMessageClient, Runnable {
                         if (answer.startsWith("ok DMAP2.0")) {
                             writer.println("startsecure");
                             state = STARTED;
+                            break;
                         }
-                        break;
                     case STARTED:
                         if (answer.startsWith("ok") && parts.length == 2) {
                             serverComponentId = parts[1];
@@ -106,6 +106,9 @@ public class MessageClient implements IMessageClient, Runnable {
                                 config.getString("mailbox.password")));
                         state = LOGGEDIN;
                         break;
+                    case LOGGEDIN:
+                        if(AESDecryptStub(answer).startsWith("ok"))
+                            break;
                     default:
                         shell.out().println("Something went wrong during the handshake, the last state was " + state);
                 }
@@ -125,7 +128,7 @@ public class MessageClient implements IMessageClient, Runnable {
         ArrayList<String> ids = new ArrayList<>();
         writer.println("list");
         try {
-            while (!(answer = reader.readLine()).equals("ok")) {
+            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                 String[] parts = answer.split("\\s");
                 ids.add(parts[0]);
             }
@@ -136,7 +139,7 @@ public class MessageClient implements IMessageClient, Runnable {
             shell.out().println("message no. " + id);
             writer.println("show " + id);
             try {
-                while (!(answer = reader.readLine()).equals("ok")) {
+                while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                     shell.out().println(answer);
                 }
             } catch (IOException e) {
@@ -151,8 +154,8 @@ public class MessageClient implements IMessageClient, Runnable {
     public void delete(String id) {
         String answer;
         try {
-            writer.println("delete " + id);
-            answer = reader.readLine();
+            writer.println(AESEncryptStub("delete " + id));
+            answer = AESDecryptStub(reader.readLine());
         } catch (IOException e) {
             throw new UncheckedIOException("Error while using delete ", e);
         }
@@ -188,9 +191,9 @@ public class MessageClient implements IMessageClient, Runnable {
     public void verify(String id) {
         String answer;
         StringBuilder messageBuilder = new StringBuilder(100);
-        writer.println("show " + id);
+        writer.println(AESEncryptStub("show " + id));
         try {
-            while (!(answer = reader.readLine()).equals("ok")) {
+            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                 String[] parts = answer.split("\\s");
                 if(answer.startsWith("data")) {
                     for (int i = 1; i < parts.length; i++) {
@@ -271,7 +274,7 @@ public class MessageClient implements IMessageClient, Runnable {
 
     @Override
     public void shutdown(){
-        writer.println("logout");
+        writer.println(AESEncryptStub("quit"));
         try {
             DMAPSocket.close();
         } catch (IOException e)
