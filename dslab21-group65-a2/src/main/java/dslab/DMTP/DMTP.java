@@ -30,7 +30,7 @@ public class DMTP {
         switch(state) {
             case WAITING:
                 if(input == null)
-                    output = "ok DMTP";
+                    output = "ok DMTP2.0";
                 else {
                     String newInput = input;
                     if(input.split("\\s").length > 1)

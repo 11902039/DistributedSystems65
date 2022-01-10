@@ -29,7 +29,7 @@ public class ClientThread extends Thread{
             PrintWriter serverWriter = new PrintWriter(client.getOutputStream());
 
             String inputLine = serverReader.readLine();
-            if(inputLine != null && inputLine.equals("ok DMTP")){
+            if(inputLine != null && inputLine.equals("ok DMTP2.0")){
                     serverWriter.println("begin");
                     serverWriter.flush();
 

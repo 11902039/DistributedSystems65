@@ -26,7 +26,7 @@ public interface IMessageClient extends Runnable {
      *
      * @param id the mail id
      */
-    void delete(String id) throws IOException;
+    void delete(String id);
 
     /**
      * Verifies the signature of the message by calculating its hash value using the shared secret. Prints 'ok' if the
@@ -48,5 +48,5 @@ public interface IMessageClient extends Runnable {
     /**
      * Shuts down the application.
      */
-    void shutdown() throws IOException;
+    void shutdown();
 }

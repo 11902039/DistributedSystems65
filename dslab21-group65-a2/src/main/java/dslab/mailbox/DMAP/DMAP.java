@@ -32,7 +32,7 @@ public class DMAP {
         switch(state){
             case LOGGEDOUT:
                 if(input == null)
-                    output = "ok DMAP";
+                    output = "ok DMAP2.0";
                 else {
                     String newInput = input;
                     String[] splitInput = input.split("\\s");

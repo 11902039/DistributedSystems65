@@ -26,6 +26,14 @@ public class MessageClient implements IMessageClient, Runnable {
     private int secretKey;
     private int AESKey;
     private int iv;
+    private static final int NOTSTARTED = 0;
+    private static final int STARTED = 1;
+    private static final int CHALLENGEGIVEN = 2;
+    private static final int CHALLENGEDONE = 3;
+    private static final int LOGGEDIN = 4;
+
+
+    private int state = NOTSTARTED;
 
 
     /**
@@ -49,62 +57,67 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     public void run() {
         String answer;
-        boolean started = false;
-        byte challenge[] = new byte[32];
-        new SecureRandom().nextBytes(challenge);
+        boolean started = false, challengeCorrect = false;
+        //byte[] challenge = new byte[32];
+        //new SecureRandom().nextBytes(challenge);
+        String challenge = "xd";
 
         try {
             DMAPSocket = new Socket(config.getString("mailbox.host"), config.getInt("mailbox.port"));
             reader = new BufferedReader(new InputStreamReader(DMAPSocket.getInputStream()));
             writer = new PrintWriter(DMAPSocket.getOutputStream());
             shell.run();
-            while ((answer = reader.readLine()) != null) {
+            while ((answer = reader.readLine()) != null)
+            {
                 shell.out().println(answer);
                 String[] parts = answer.split("\\s");
-                if (answer.startsWith("ok DMAP2.0"))
-                {
-                    writer.println("startsecure");
-                    started = true;
-                }
-                else if (started && answer.startsWith("ok") && parts.length == 2) {
-                    serverComponentId = parts[1];
-                    /*
-                    TODO: Implement the cryptographic functions
-                    iv = ???;
-                    secretKey = generateSecretKey();
-                    AESKey = generateAESKey(iv);
-                    writer.println(RSAEncrypt("ok " + challenge + " " + secretKey + " " + iv));
-                    */
-                }
-                else if(started) {
-                    /*
-                    TODO: Implement the cryptographic functions
-                    answer = AESDecrypt(answer);
-                    String[] parts = answer.split("\\s");
-                    if(answer.startsWith("ok") && parts.length == 2)
-                    {
-                        if(parts[1].equals(challenge))
-                        {
-                            writer.println(AESEncrypt("ok"));
+                switch (state) {
+                    case NOTSTARTED:
+                        if (answer.startsWith("ok DMAP2.0")) {
+                            writer.println("startsecure");
+                            state = STARTED;
                         }
-                    }
-                    */
-                }
-                else
-                {
-                    DMAPSocket.close();
+                        break;
+                    case STARTED:
+                        if (answer.startsWith("ok") && parts.length == 2) {
+                            serverComponentId = parts[1];
+
+                            //TODO: Implement the cryptographic functions
+                            iv = 2137;
+                            // secretKey = generateSecretKey();
+                            // AESKey = generateAESKey(iv);
+                            writer.println(RSAEncryptStub("ok " + challenge + " " + secretKey + " " + iv));
+                            state = CHALLENGEGIVEN;
+                            break;
+                        }
+                    case CHALLENGEGIVEN:
+                        answer = AESDecryptStub(answer);
+                        parts = answer.split("\\s");
+                        if (answer.startsWith("ok") && parts.length == 2) {
+                            if (parts[1].equals(challenge))
+                            {
+                                writer.println(AESEncryptStub("ok"));
+                                state = CHALLENGEDONE;
+                                break;
+                            }
+                        }
+                    case CHALLENGEDONE:
+                        writer.println(AESEncryptStub("login " + config.getString("mailbox.user") + " " +
+                                config.getString("mailbox.password")));
+                        state = LOGGEDIN;
+                        break;
+                    default:
+                        shell.out().println("Something went wrong during the handshake, the last state was " + state);
                 }
             }
-
             shell.out().println("Client is up!");
-
-
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
         }
 
 
     }
+
 
     @Override
     public void inbox() {
@@ -146,6 +159,31 @@ public class MessageClient implements IMessageClient, Runnable {
         shell.out().println(answer);
     }
 
+    public String hashStub (String message)
+    {
+        return message;
+    }
+
+    public String AESEncryptStub(String message)
+    {
+        return message;
+    }
+
+    public String AESDecryptStub(String message)
+    {
+        return message;
+    }
+
+    public String RSAEncryptStub(String message)
+    {
+        return message;
+    }
+
+    public String RSADecryptStub(String message)
+    {
+        return message;
+    }
+
     @Override
     public void verify(String id) {
         String answer;
@@ -164,16 +202,15 @@ public class MessageClient implements IMessageClient, Runnable {
                 }
                 if(answer.startsWith("hash"))
                 {
-                    /*
-                    TODO: implement the hash function
-                   if(parts[1].equals(hash(messageBuilder.toString())))
+                    //TODO: implement the hash function
+                   if(parts[1].equals(hashStub(messageBuilder.toString())))
                     {
                         shell.out().println("ok");
                     }
                     else {
                        shell.out().println("error");
                    }
-                     */
+
                 }
             }
         } catch (IOException e) {
@@ -214,10 +251,8 @@ public class MessageClient implements IMessageClient, Runnable {
                             count++;
                             break;
                         case 3:
-                            /*
-                            TODO: implement the hash function
-                            writerDMTP.println("hash" + hash(data));
-                            */
+                            //TODO: implement the hash function
+                            writerDMTP.println("hash" + hashStub(data));
                             count++;
                             break;
                         case 4:
