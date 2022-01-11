@@ -25,8 +25,8 @@ public class DMTP {
     }
 
     public String processInput(String input) {
-        String output = "";
-
+        String output = "err0r 0utput";
+        System.out.println("input: " + input);
         switch(state) {
             case WAITING:
                 if(input == null)
@@ -56,7 +56,7 @@ public class DMTP {
                             output = "error no message started - use the 'begin' command";
                             break;
                         default:
-                            output = "error protocol error";
+                            output = "WAITING: error protocol error";
                             break;
                     }
                 }
@@ -184,7 +184,7 @@ public class DMTP {
                             }
                             break;
                         default:
-                            output = "error protocol error";
+                            output = "WORKING: error protocol error";
                             break;
                     }
 
@@ -192,7 +192,7 @@ public class DMTP {
                 break;
         }
 
-
+        System.out.println("output: " + output);
         return output;
     }
 

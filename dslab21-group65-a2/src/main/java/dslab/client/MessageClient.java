@@ -162,6 +162,7 @@ public class MessageClient implements IMessageClient, Runnable {
         String answer;
         ArrayList<String> ids = new ArrayList<>();
         writer.println("list");
+        writer.flush();
         try {
             while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                 String[] parts = answer.split("\\s");
@@ -173,6 +174,7 @@ public class MessageClient implements IMessageClient, Runnable {
         for (String id : ids) {
             shell.out().println("message no. " + id);
             writer.println("show " + id);
+            writer.flush();
             try {
                 while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                     shell.out().println(answer);
@@ -191,6 +193,7 @@ public class MessageClient implements IMessageClient, Runnable {
         String answer;
         try {
             writer.println(AESEncryptStub("delete " + id));
+            writer.flush();
             answer = AESDecryptStub(reader.readLine());
         } catch (IOException e) {
             throw new UncheckedIOException("Error while using delete ", e);
@@ -223,12 +226,19 @@ public class MessageClient implements IMessageClient, Runnable {
         return message;
     }
 
+    @Command
+    public void die()
+    {
+        System.out.println("nooooooooooooooooo");
+    }
+
     @Override
     @Command
     public void verify(String id) {
         String answer;
         StringBuilder messageBuilder = new StringBuilder(100);
         writer.println(AESEncryptStub("show " + id));
+        writer.flush();
         try {
             while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                 String[] parts = answer.split("\\s");
@@ -262,58 +272,79 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void msg(String to, String subject, String data) {
+        shell.out().println("GOTTA msg " + to + " " + subject + " " + data);
         String answer;
         int count = 0;
         try {
             Socket DMTPSocket = new Socket(config.getString("transfer.host"), config.getInt("transfer.port"));
             BufferedReader readerDMTP = new BufferedReader(new InputStreamReader(DMTPSocket.getInputStream()));
             PrintWriter writerDMTP = new PrintWriter(DMTPSocket.getOutputStream());
-
-            while ((answer = reader.readLine()) != null) {
+            shell.out().println("Sockety things done");
+            while ((answer = readerDMTP.readLine()) != null && count < 6) {
                 shell.out().println(answer);
-                String[] parts = answer.split("\\s");
-                if (answer.startsWith("ok DMTP2.0"))
+                if (answer.equals("ok DMTP2.0"))
                 {
+                    shell.out().println("sending: begin");
                     writerDMTP.println("begin");
+                    writerDMTP.flush();
                 }
                 else if (answer.startsWith("ok"))
                 {
                     switch (count) {
                         case 0:
-                            writerDMTP.println("from" + subject);
+                            writerDMTP.println("from " + config.getString("transfer.email"));
+                            writerDMTP.flush();
                             count++;
                             break;
                         case 1:
-                            writerDMTP.println("to" + subject);
+                            writerDMTP.println("to " + to);
+                            writerDMTP.flush();
                             count++;
                             break;
                         case 2:
-                            writerDMTP.println("data" + data);
+                            writerDMTP.println("subject " + subject);
+                            writerDMTP.flush();
                             count++;
                             break;
                         case 3:
-                            //TODO: implement the hash function
-                            writerDMTP.println("hash" + hashStub(data));
+                            writerDMTP.println("data " + data);
+                            writerDMTP.flush();
                             count++;
                             break;
                         case 4:
+                            //TODO: implement the hash function
+                            writerDMTP.println("hash " + hashStub(data));
+                            writerDMTP.flush();
+                            count++;
+                            break;
+                        case 5:
                             writerDMTP.println("send");
+                            writerDMTP.flush();
                             count++;
                             break;
                         default:
-                            break;
                     }
                 }
             }
+        } catch (UnknownHostException e) {
+            System.out.println("Cannot connect to host: " + e.getMessage());
+        } catch (SocketException e) {
+            // when the socket is closed, the I/O methods of the Socket will throw a SocketException
+            // almost all SocketException cases indicate that the socket was closed
+            System.out.println("SocketException while handling socket: " + e.getMessage());
         } catch (IOException e) {
-            throw new UncheckedIOException("Error while creating server socket", e);
+            // you should properly handle all other exceptions
+            throw new UncheckedIOException(e);
         }
+
     }
+
 
     @Override
     @Command
     public void shutdown(){
         writer.println(AESEncryptStub("quit"));
+        writer.flush();
         try {
             DMAPSocket.close();
         } catch (IOException e)
