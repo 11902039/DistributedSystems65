@@ -132,7 +132,7 @@ public class MessageClient implements IMessageClient, Runnable {
                             random.nextBytes(iv);
 
                             //generating the cipher
-                            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
 
                             //setting it to encrypt mode
                             cipher.init(Cipher.ENCRYPT_MODE,serverPublicKey);
