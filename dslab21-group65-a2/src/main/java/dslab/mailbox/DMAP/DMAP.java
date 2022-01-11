@@ -3,9 +3,12 @@ package dslab.mailbox.DMAP;
 import dslab.Message.Message;
 import dslab.mailbox.tcp.dmapThread;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import javax.crypto.*;
+import java.security.*;
 
 public class DMAP {
 
