@@ -45,7 +45,7 @@ public class DMAP {
     }
 
     public String processInput(String input){
-        String output = "";
+        String output = "waiting for client's message";
 
         switch(state){
             case PLAIN:
@@ -95,11 +95,13 @@ public class DMAP {
                 }
                 break;
             case CHALLENGERESPONSE:
+                System.out.println("DMAP CHALLENGERESPONSE");
                 input = AESDecryptStub(input);
                 splitInput = input.split("\\s");
                 switch(input.toLowerCase(Locale.ROOT)) {
                     case "ok":
                         if (splitInput.length == 1) {
+                            System.out.println("DMAP LOGGEDOUT SET");
                             state = LOGGEDOUT;
                             break;
                         }
@@ -112,7 +114,7 @@ public class DMAP {
                 input = AESDecryptStub(input);
                 newInput = input;
                 splitInput = input.split("\\s");
-
+                System.out.println("DMAP LOGGEDOUT");
                     if(splitInput.length > 1)
                         newInput = splitInput[0];
                     switch(newInput.toLowerCase(Locale.ROOT)){
@@ -157,6 +159,7 @@ public class DMAP {
                     }
                     break;
             case LOGGEDIN:
+                System.out.println("DMAP LOGGEDIN");
                 if(input != null){
                     input = AESDecryptStub(input);
                      newInput = input;

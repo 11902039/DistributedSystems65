@@ -124,12 +124,15 @@ public class MessageClient implements IMessageClient, Runnable {
                     case LOGGEDIN:
                         shell.out().println("LOGGEDIN");
                         if(AESDecryptStub(answer).equals("ok"))
-                            break;
+                        {
+                            shell.out().println("Client is up!");
+                            shell.run();
+                        }
+                        break;
                     default:
                 }
             }
-            shell.out().println("Client is up!");
-            shell.run();
+
         } catch (UnknownHostException e) {
             System.out.println("Cannot connect to host: " + e.getMessage());
         } catch (SocketException e) {
@@ -308,6 +311,7 @@ public class MessageClient implements IMessageClient, Runnable {
     }
 
     @Override
+    @Command
     public void shutdown(){
         writer.println(AESEncryptStub("quit"));
         try {
