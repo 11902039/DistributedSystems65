@@ -27,8 +27,10 @@ public class DMAP {
 
     private HashMap<Integer,Message> list;
     private Message message;
+    private String componentID;
 
-    public DMAP(dmapThread thread){
+    public DMAP(dmapThread thread, String componentID){
+        this.componentID = componentID;
         this.thread = thread;
     }
 
@@ -63,7 +65,7 @@ public class DMAP {
                         newInput = splitInput[0];
                     switch(newInput.toLowerCase(Locale.ROOT)){
                         case "startsecure":
-                            output = "ok " + thread.getId();
+                            output = "ok " + componentID;
                             state = RSAENCRYPTED;
                             break;
                         default:

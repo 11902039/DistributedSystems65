@@ -12,12 +12,14 @@ public class dmapThread extends Thread{
 
     private Socket client;
     private ListenerThread parent;
+    private String componentID;
 
-    public dmapThread(Socket socket, ListenerThread listenerThread){
+    public dmapThread(Socket socket, ListenerThread listenerThread, String componentID){
         super("DMAPThread");
         this.client = socket;
         this.parent = listenerThread;
         this.parent.addSocket(client);
+        this.componentID = componentID;
     }
 
     public int checkLogin(String name, String password){
@@ -46,7 +48,7 @@ public class dmapThread extends Thread{
         ) {
             String inputLine, outputLine;
 
-            DMAP protocol = new DMAP(this);
+            DMAP protocol = new DMAP(this, componentID);
             outputLine = protocol.processInput(null);
             writer.println(outputLine);
             writer.flush();

@@ -8,17 +8,16 @@ import at.ac.tuwien.dsg.orvell.Shell;
 import at.ac.tuwien.dsg.orvell.StopShellException;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
+import dslab.util.AEScrypting;
 import dslab.util.Config;
 import dslab.util.Keys;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -66,15 +65,6 @@ public class MessageClient implements IMessageClient, Runnable {
         this.out = out;
         shell = new Shell(in, out);
         shell.register(this);
-        random = new SecureRandom();
-
-        //initializing the keyGenerator with 256 bits
-        try {
-            keygen = KeyGenerator.getInstance("AES");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        keygen.init(256);
 
     }
 
@@ -124,27 +114,23 @@ public class MessageClient implements IMessageClient, Runnable {
                             challenge = new byte[32];
                             random.nextBytes(challenge);
 
-                            //generating the Secret key
-                            secretKey = keygen.generateKey();
+                            AEScrypting crypter = new AEScrypting();
+
+                            //generating the secret key
+                            secretKey = crypter.getSecretKey();
 
                             //generating the iv, a random 16byte number
-                            iv = new byte[16];
-                            random.nextBytes(iv);
+                            iv = crypter.getIv();
 
-                            //generating the cipher
-                            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+                            //generating the RSA cipher
+                            Cipher cipherRSA = Cipher.getInstance("RSA/ECB/PKCS5Padding");
 
                             //setting it to encrypt mode
-                            cipher.init(Cipher.ENCRYPT_MODE,serverPublicKey);
+                            cipherRSA.init(Cipher.ENCRYPT_MODE,serverPublicKey);
 
-                            //grouping up the components
                             String message = "ok " + challenge + " " +  secretKey.getEncoded() + " " + iv;
 
-                            //encrypting
-                            byte[] encryptedMessage = cipher.doFinal(message.getBytes());
-
-                            //converting it to String
-                            String messageToSend = Base64.getEncoder().encodeToString(encryptedMessage);
+                            String messageToSend = crypter.Encrypt(message);
 
 
                             //TODO: Implement the cryptographic functions
@@ -201,7 +187,7 @@ public class MessageClient implements IMessageClient, Runnable {
         } catch (IOException e) {
             // you should properly handle all other exceptions
             throw new UncheckedIOException(e);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         } finally {
             if (DMAPSocket != null && !DMAPSocket.isClosed()) {
