@@ -11,6 +11,7 @@ public class DMAP {
 
     private static final int PLAIN = -1;
     private static final int RSAENCRYPTED = -2;
+    private static final int CHALLENGERESPONSE = -3;
     private static final int LOGGEDOUT = 0;
     private static final int LOGGEDIN = 1;
 
@@ -50,6 +51,7 @@ public class DMAP {
             case PLAIN:
                 if(input == null)
                     output = "ok DMAP2.0";
+
                 else {
                     String newInput = input;
                     String[] splitInput = input.split("\\s");
@@ -62,7 +64,7 @@ public class DMAP {
                             state = RSAENCRYPTED;
                             break;
                         default:
-                            output = "error protocol error";
+                            output = "PLAIN: error protocol error";
                             break;
                     }
                 }
@@ -76,25 +78,36 @@ public class DMAP {
                     newInput = splitInput[0];
                 switch(newInput.toLowerCase(Locale.ROOT)){
                     case "ok":
-                        if(splitInput.length == 1)
+                        if(splitInput.length < 4)
                         {
+                            output = "RSAENCRYPTED: error not enough data";
+                            break;
+                        }
+                        String clientChallenge = splitInput[1];
+                        String secretKey = splitInput[2];
+                        String iv = splitInput[2];
+                        output = "ok " + clientChallenge;
+                        state = CHALLENGERESPONSE;
+                        break;
+                    default:
+                        output = "RSAENCRYPRTED: error protocol error";
+                        break;
+                }
+                break;
+            case CHALLENGERESPONSE:
+                input = AESDecryptStub(input);
+                splitInput = input.split("\\s");
+                switch(input.toLowerCase(Locale.ROOT)) {
+                    case "ok":
+                        if (splitInput.length == 1) {
                             state = LOGGEDOUT;
                             break;
                         }
-                        else if(splitInput.length < 4)
-                        {
-                            output = "error not enough data";
-                            break;
-                        }
-                         String clientChallenge = splitInput[1];
-                         String secretKey = splitInput[2];
-                         String iv = splitInput[2];
-                        output = clientChallenge;
-                        break;
                     default:
-                        output = "error protocol error";
+                        output = "CHALLENGERESPONSE: error protocol error";
                         break;
                 }
+                break;
             case LOGGEDOUT:
                 input = AESDecryptStub(input);
                 newInput = input;
@@ -139,7 +152,7 @@ public class DMAP {
                             output = "ok bye";
                             break;
                         default:
-                            output = "error protocol error";
+                            output = "LOGGEDOUT: error protocol error";
                             break;
                     }
                     break;
@@ -217,7 +230,7 @@ public class DMAP {
                                 output ="error during deleting";
                             break;
                         default:
-                            output = "error protocol error";
+                            output = "LOGGEDIN: error protocol error";
                             break;
                     }
                 }

@@ -6,8 +6,12 @@ import java.net.Socket;
 
 import at.ac.tuwien.dsg.orvell.Shell;
 import at.ac.tuwien.dsg.orvell.StopShellException;
+import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
 import dslab.util.Config;
+
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
@@ -62,60 +66,87 @@ public class MessageClient implements IMessageClient, Runnable {
         //new SecureRandom().nextBytes(challenge);
         String challenge = "xd";
 
+        shell.out().println("Starting the client for " + config.getString("transfer.email") + "...");
+
         try {
             DMAPSocket = new Socket(config.getString("mailbox.host"), config.getInt("mailbox.port"));
             reader = new BufferedReader(new InputStreamReader(DMAPSocket.getInputStream()));
             writer = new PrintWriter(DMAPSocket.getOutputStream());
-            shell.run();
+
             while ((answer = reader.readLine()) != null)
             {
                 shell.out().println(answer);
                 String[] parts = answer.split("\\s");
                 switch (state) {
                     case NOTSTARTED:
+                        shell.out().println("NOTSTARTED: startsecure");
                         if (answer.startsWith("ok DMAP2.0")) {
                             writer.println("startsecure");
+                            writer.flush();
                             state = STARTED;
-                            break;
                         }
+                        break;
                     case STARTED:
                         if (answer.startsWith("ok") && parts.length == 2) {
                             serverComponentId = parts[1];
-
+                            shell.out().println("STARTED: ok " + challenge + " " + secretKey + " " + iv);
                             //TODO: Implement the cryptographic functions
                             iv = 2137;
                             // secretKey = generateSecretKey();
                             // AESKey = generateAESKey(iv);
                             writer.println(RSAEncryptStub("ok " + challenge + " " + secretKey + " " + iv));
+                            writer.flush();
                             state = CHALLENGEGIVEN;
-                            break;
                         }
+                        break;
                     case CHALLENGEGIVEN:
                         answer = AESDecryptStub(answer);
                         parts = answer.split("\\s");
-                        if (answer.startsWith("ok") && parts.length == 2) {
+                        if (answer.startsWith("ok") && parts.length == 2)
+                        {
                             if (parts[1].equals(challenge))
                             {
+                                shell.out().println("CHALLENGEGIVEN: ok");
                                 writer.println(AESEncryptStub("ok"));
+                                writer.flush();
                                 state = CHALLENGEDONE;
-                                break;
                             }
                         }
+                        break;
                     case CHALLENGEDONE:
+                        shell.out().println("CHALLENGEDONE: login " + config.getString("mailbox.user") + " " +
+                                config.getString("mailbox.password"));
                         writer.println(AESEncryptStub("login " + config.getString("mailbox.user") + " " +
                                 config.getString("mailbox.password")));
+                        writer.flush();
                         state = LOGGEDIN;
                         break;
                     case LOGGEDIN:
-                        if(AESDecryptStub(answer).startsWith("ok"))
+                        shell.out().println("LOGGEDIN");
+                        if(AESDecryptStub(answer).equals("ok"))
                             break;
                     default:
-                        shell.out().println("Something went wrong during the handshake, the last state was " + state);
                 }
             }
             shell.out().println("Client is up!");
+            shell.run();
+        } catch (UnknownHostException e) {
+            System.out.println("Cannot connect to host: " + e.getMessage());
+        } catch (SocketException e) {
+            // when the socket is closed, the I/O methods of the Socket will throw a SocketException
+            // almost all SocketException cases indicate that the socket was closed
+            System.out.println(state +": SocketException while handling socket: " + e.getMessage());
         } catch (IOException e) {
-            throw new UncheckedIOException("Error while creating server socket", e);
+            // you should properly handle all other exceptions
+            throw new UncheckedIOException(e);
+        } finally {
+            if (DMAPSocket != null && !DMAPSocket.isClosed()) {
+                try {
+                    DMAPSocket.close();
+                } catch (IOException e) {
+                    // Ignored because we cannot handle it
+                }
+            }
         }
 
 
@@ -123,6 +154,7 @@ public class MessageClient implements IMessageClient, Runnable {
 
 
     @Override
+    @Command
     public void inbox() {
         String answer;
         ArrayList<String> ids = new ArrayList<>();
@@ -151,6 +183,7 @@ public class MessageClient implements IMessageClient, Runnable {
     }
 
     @Override
+    @Command
     public void delete(String id) {
         String answer;
         try {
@@ -188,6 +221,7 @@ public class MessageClient implements IMessageClient, Runnable {
     }
 
     @Override
+    @Command
     public void verify(String id) {
         String answer;
         StringBuilder messageBuilder = new StringBuilder(100);
@@ -223,6 +257,7 @@ public class MessageClient implements IMessageClient, Runnable {
     }
 
     @Override
+    @Command
     public void msg(String to, String subject, String data) {
         String answer;
         int count = 0;
