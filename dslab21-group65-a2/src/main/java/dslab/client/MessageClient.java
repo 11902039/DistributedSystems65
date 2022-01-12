@@ -170,7 +170,8 @@ public class MessageClient implements IMessageClient, Runnable {
                             if (Arrays.equals(returnedChallenge, challenge))
                             {
                                 shell.out().println("CHALLENGEGIVEN: ok");
-                                writer.println(AESEncryptStub("ok"));
+                                AEScrypting AEScrypter2 = new AEScrypting(iv,secretKey);
+                                writer.println(AEScrypter2.Encrypt("ok"));
                                 writer.flush();
                                 state = CHALLENGEDONE;
                             }
@@ -179,14 +180,16 @@ public class MessageClient implements IMessageClient, Runnable {
                     case CHALLENGEDONE:
                         shell.out().println("CHALLENGEDONE: login " + config.getString("mailbox.user") + " " +
                                 config.getString("mailbox.password"));
-                        writer.println(AESEncryptStub("login " + config.getString("mailbox.user") + " " +
+                        AEScrypting AEScrypter3 = new AEScrypting(iv,secretKey);
+                        writer.println(AEScrypter3.Encrypt("login " + config.getString("mailbox.user") + " " +
                                 config.getString("mailbox.password")));
                         writer.flush();
                         state = LOGGEDIN;
                         break;
                     case LOGGEDIN:
                         shell.out().println("LOGGEDIN");
-                        if(AESDecryptStub(answer).equals("ok"))
+                        AEScrypting AEScrypter4 = new AEScrypting(iv,secretKey);
+                        if(AEScrypter4.Decrypt(answer).equals("ok"))
                         {
                             shell.out().println("Client is up!");
                             shell.run();
@@ -226,18 +229,25 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void inbox() {
-        String answer;
+        AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
+        String answer = "";
         ArrayList<String> ids = new ArrayList<>();
-        writer.println("list");
+        try {
+            writer.println(AEScrypter.Encrypt("list"));
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         writer.flush();
         try {
-            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok") && !answer.startsWith("no")) {
+            while (!(answer = AEScrypter.Decrypt(reader.readLine())).equals("ok") && !answer.startsWith("no")) {
                 String[] parts = answer.split("\\s");
                 ids.add(parts[0]);
                 shell.out().println(answer);
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
         if(answer.equals("no mails available"))
         {
@@ -248,11 +258,13 @@ public class MessageClient implements IMessageClient, Runnable {
             writer.println("show " + id);
             writer.flush();
             try {
-                while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
+                while (!(answer = AEScrypter.Decrypt(reader.readLine())).equals("ok")) {
                     shell.out().println(answer);
                 }
             } catch (IOException e) {
                 throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
+            } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -260,13 +272,16 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void delete(String id) {
-        String answer;
+        AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
+        String answer = "";
         try {
-            writer.println(AESEncryptStub("delete " + id));
+            writer.println(AEScrypter.Encrypt("delete " + id));
             writer.flush();
-            answer = AESDecryptStub(reader.readLine());
+            answer = AEScrypter.Decrypt(reader.readLine());
         } catch (IOException e) {
             throw new UncheckedIOException("Error while using delete ", e);
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
         shell.out().println(answer);
     }
@@ -295,12 +310,17 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void verify(String id) {
+        AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
         String answer;
         StringBuilder messageBuilder = new StringBuilder(100);
-        writer.println(AESEncryptStub("show " + id));
+        try {
+            writer.println(AEScrypter.Encrypt("show " + id));
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         writer.flush();
         try {
-            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
+            while (!(answer = AEScrypter.Decrypt(reader.readLine())).equals("ok")) {
                 //shell.out().println(answer);
                 String[] parts = answer.split("\\s");
                 if(answer.startsWith("data")) {
@@ -328,6 +348,8 @@ public class MessageClient implements IMessageClient, Runnable {
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Error while using show ", e);
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
 
     }
@@ -413,7 +435,12 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void shutdown(){
-        writer.println(AESEncryptStub("quit"));
+        AEScrypting AEScrypter = new AEScrypting(iv, secretKey);
+        try {
+            writer.println(AEScrypter.Encrypt("quit"));
+        } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         writer.flush();
         try {
             DMAPSocket.close();

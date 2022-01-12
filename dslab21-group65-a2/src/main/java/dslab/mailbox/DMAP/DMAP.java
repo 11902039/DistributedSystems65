@@ -61,6 +61,13 @@ public class DMAP {
     public String processInput(String input) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         String output = "waiting for client's message";
 
+        if(state == PLAIN || state == RSAENCRYPTED) {
+        }
+        else{
+            AEScrypting decrypter = new AEScrypting(iv, secretKey);
+            input = decrypter.Decrypt(input);
+        }
+
         switch(state){
             case PLAIN:
                 if(input == null)
@@ -128,7 +135,7 @@ public class DMAP {
 
                         String returnmessage = "ok " + clientChallenge;
                         //System.out.println("return before cyphering: " + returnmessage);
-                        output = AEScrypter.Encrypt(returnmessage);
+                        output = returnmessage;
                         //System.out.println("return after cyphering: " + output);
 
                         //output = "ok " + clientChallenge;
@@ -141,7 +148,6 @@ public class DMAP {
                 break;
             case CHALLENGERESPONSE:
                 System.out.println("DMAP CHALLENGERESPONSE");
-                input = AESDecryptStub(input);
                 splitInput = input.split("\\s");
                 switch(input.toLowerCase(Locale.ROOT)) {
                     case "ok":
@@ -156,7 +162,6 @@ public class DMAP {
                 }
                 break;
             case LOGGEDOUT:
-                input = AESDecryptStub(input);
                 newInput = input;
                 splitInput = input.split("\\s");
                 System.out.println("DMAP LOGGEDOUT");
@@ -206,7 +211,6 @@ public class DMAP {
             case LOGGEDIN:
                 System.out.println("DMAP LOGGEDIN: input: " + input);
                 if(input != null){
-                    input = AESDecryptStub(input);
                      newInput = input;
                      splitInput = input.split("\\s");
 
@@ -284,7 +288,6 @@ public class DMAP {
                 }
                 break;
             case SHOWING:
-                input = AESDecryptStub(input);
                 if(input != null) {
                     switch(input){
                         case "0":
@@ -312,7 +315,8 @@ public class DMAP {
                 }
                 break;
             case LISTING: //State, expects null answers from thread to keep listing mails
-                input = AESDecryptStub(input);
+                AEScrypting AEScrypter6 = new AEScrypting(iv,secretKey);
+                input = AEScrypter6.Decrypt(input);
                 if (input == null){
                     if(!list.isEmpty()){
                        int id = list.keySet().iterator().next();
@@ -328,11 +332,12 @@ public class DMAP {
                 }
                 break;
         }
-        if(state != PLAIN)
-            return AESEncryptStub(output);
-        else
+        if(state == PLAIN || state == RSAENCRYPTED) {
             return output;
+        }
+        else{
+            AEScrypting encrypter = new AEScrypting(iv, secretKey);
+            return encrypter.Encrypt(output);
+        }
     }
-
-
 }
