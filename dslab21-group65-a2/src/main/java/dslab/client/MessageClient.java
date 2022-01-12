@@ -163,18 +163,25 @@ public class MessageClient implements IMessageClient, Runnable {
         ArrayList<String> ids = new ArrayList<>();
         writer.println("list");
         writer.flush();
+        shell.out().println("inbox: list");
         try {
-            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
+            while (!(answer = AESDecryptStub(reader.readLine())).equals("ok") && !answer.startsWith("no")) {
                 String[] parts = answer.split("\\s");
                 ids.add(parts[0]);
+                shell.out().println(answer);
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
+        }
+        if(answer.equals("no mails available"))
+        {
+            shell.out().println(answer);
         }
         for (String id : ids) {
             shell.out().println("message no. " + id);
             writer.println("show " + id);
             writer.flush();
+            shell.out().println("inbox: show " + id);
             try {
                 while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                     shell.out().println(answer);
@@ -183,8 +190,6 @@ public class MessageClient implements IMessageClient, Runnable {
                 throw new UncheckedIOException("Error while reading the mailbox server answer to list", e);
             }
         }
-        writer.println("");
-
     }
 
     @Override
@@ -224,12 +229,6 @@ public class MessageClient implements IMessageClient, Runnable {
     public String RSADecryptStub(String message)
     {
         return message;
-    }
-
-    @Command
-    public void die()
-    {
-        System.out.println("nooooooooooooooooo");
     }
 
     @Override
@@ -325,6 +324,11 @@ public class MessageClient implements IMessageClient, Runnable {
                         default:
                     }
                 }
+            }
+            try {
+                DMTPSocket.close();
+            } catch (IOException e) {
+                // Ignored because we cannot handle it
             }
         } catch (UnknownHostException e) {
             System.out.println("Cannot connect to host: " + e.getMessage());

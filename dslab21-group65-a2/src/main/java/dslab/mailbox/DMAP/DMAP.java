@@ -159,7 +159,7 @@ public class DMAP {
                     }
                     break;
             case LOGGEDIN:
-                System.out.println("DMAP LOGGEDIN");
+                System.out.println("DMAP LOGGEDIN: input: " + input);
                 if(input != null){
                     input = AESDecryptStub(input);
                      newInput = input;
@@ -250,13 +250,16 @@ public class DMAP {
                             }
                             break;
                         case "1":
-                            output = "subject " + message.getSubject();
+                            output = "subject: " + message.getSubject();
                             break;
                         case "2":
-                            output = "data " + message.getData();
+                            output = "data: " + message.getData();
                             break;
                         case "3":
-                            output = "hash " + message.getHash();
+                            output = "hash: " + message.getHash();
+                            break;
+                        case "4":
+                            output = "ok";
                             this.message = null;
                             this.state = LOGGEDIN;
                             break;
@@ -273,7 +276,7 @@ public class DMAP {
                        list.remove(id);
                        break;
                     }
-                    output = null; //if all mails listed, signal with null.
+                    output = "ok"; //if all mails listed, signal with ok.
                     this.list = null;
                     state = LOGGEDIN;
                     break;
