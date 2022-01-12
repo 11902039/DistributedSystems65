@@ -163,7 +163,6 @@ public class MessageClient implements IMessageClient, Runnable {
         ArrayList<String> ids = new ArrayList<>();
         writer.println("list");
         writer.flush();
-        shell.out().println("inbox: list");
         try {
             while (!(answer = AESDecryptStub(reader.readLine())).equals("ok") && !answer.startsWith("no")) {
                 String[] parts = answer.split("\\s");
@@ -181,7 +180,6 @@ public class MessageClient implements IMessageClient, Runnable {
             shell.out().println("message no. " + id);
             writer.println("show " + id);
             writer.flush();
-            shell.out().println("inbox: show " + id);
             try {
                 while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
                     shell.out().println(answer);
@@ -226,10 +224,6 @@ public class MessageClient implements IMessageClient, Runnable {
         return message;
     }
 
-    public String RSADecryptStub(String message)
-    {
-        return message;
-    }
 
     @Override
     @Command
@@ -240,6 +234,7 @@ public class MessageClient implements IMessageClient, Runnable {
         writer.flush();
         try {
             while (!(answer = AESDecryptStub(reader.readLine())).equals("ok")) {
+                //shell.out().println(answer);
                 String[] parts = answer.split("\\s");
                 if(answer.startsWith("data")) {
                     for (int i = 1; i < parts.length; i++) {
@@ -247,14 +242,16 @@ public class MessageClient implements IMessageClient, Runnable {
                         if(i + 1 != parts.length) {
                             messageBuilder.append(" ");
                         }
+                        //shell.out().println(messageBuilder.toString());
                     }
                 }
                 if(answer.startsWith("hash"))
                 {
-                    //TODO: implement the hash function
-                   if(parts[1].equals(hashStub(messageBuilder.toString())))
-                    {
-                        shell.out().println("ok");
+                    if(parts.length > 1) {
+                        //TODO: implement the hash function
+                        if (parts[1].equals(hashStub(messageBuilder.toString()))) {
+                            shell.out().println("ok");
+                        }
                     }
                     else {
                        shell.out().println("error");
@@ -271,19 +268,16 @@ public class MessageClient implements IMessageClient, Runnable {
     @Override
     @Command
     public void msg(String to, String subject, String data) {
-        shell.out().println("GOTTA msg " + to + " " + subject + " " + data);
         String answer;
         int count = 0;
         try {
             Socket DMTPSocket = new Socket(config.getString("transfer.host"), config.getInt("transfer.port"));
             BufferedReader readerDMTP = new BufferedReader(new InputStreamReader(DMTPSocket.getInputStream()));
             PrintWriter writerDMTP = new PrintWriter(DMTPSocket.getOutputStream());
-            shell.out().println("Sockety things done");
             while ((answer = readerDMTP.readLine()) != null && count < 6) {
                 shell.out().println(answer);
                 if (answer.equals("ok DMTP2.0"))
                 {
-                    shell.out().println("sending: begin");
                     writerDMTP.println("begin");
                     writerDMTP.flush();
                 }
@@ -311,7 +305,7 @@ public class MessageClient implements IMessageClient, Runnable {
                             count++;
                             break;
                         case 4:
-                            //TODO: implement the hash function
+                            //TODO: implement the hash function;
                             writerDMTP.println("hash " + hashStub(data));
                             writerDMTP.flush();
                             count++;

@@ -51,6 +51,12 @@ public class ClientThread extends Thread{
 
                     serverReader.readLine();
 
+                    if(!message.getHash().equals("")) {
+                        serverWriter.println("hash " + message.getHash());
+                        serverWriter.flush();
+
+                        serverReader.readLine();
+                    }
                     String outputline = "to ";
                     List<String> recips = message.getRecipients();
                     outputline += recips.get(0);
