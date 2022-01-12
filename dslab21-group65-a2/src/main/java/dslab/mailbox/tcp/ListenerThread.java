@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 
 public class ListenerThread extends Thread implements IListenerThread {
 
-    private String componentID;
     private final ServerSocket serverSocket;
     private boolean listening;
     private final MailboxServer mailboxServer;
@@ -26,12 +25,11 @@ public class ListenerThread extends Thread implements IListenerThread {
     private ExecutorService ThreadPool;
     private ConcurrentLinkedQueue<Socket> sockets = new ConcurrentLinkedQueue<>();
 
-    public ListenerThread(ServerSocket serverSocket, MailboxServer mailboxServer, boolean DMTP, String componentID) {
+    public ListenerThread(ServerSocket serverSocket, MailboxServer mailboxServer, boolean DMTP) {
         this.serverSocket = serverSocket;
         listening = true;
         this.DMTP = DMTP;
         this.mailboxServer = mailboxServer;
-        this.componentID = componentID;
     }
 
     @Override
@@ -43,7 +41,7 @@ public class ListenerThread extends Thread implements IListenerThread {
                 if (DMTP)
                     t = new dmtpThread(serverSocket.accept(), this);
                 else
-                    t = new dmapThread(serverSocket.accept(), this, componentID);
+                    t = new dmapThread(serverSocket.accept(), this);
                 ThreadPool.submit(t);
             }
         }catch (SocketException e) {

@@ -3,12 +3,9 @@ package dslab.mailbox.DMAP;
 import dslab.Message.Message;
 import dslab.mailbox.tcp.dmapThread;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import javax.crypto.*;
-import java.security.*;
 
 public class DMAP {
 
@@ -27,10 +24,8 @@ public class DMAP {
 
     private HashMap<Integer,Message> list;
     private Message message;
-    private String componentID;
 
-    public DMAP(dmapThread thread, String componentID){
-        this.componentID = componentID;
+    public DMAP(dmapThread thread){
         this.thread = thread;
     }
 
@@ -65,7 +60,7 @@ public class DMAP {
                         newInput = splitInput[0];
                     switch(newInput.toLowerCase(Locale.ROOT)){
                         case "startsecure":
-                            output = "ok " + componentID;
+                            output = "ok " + thread.getId();
                             state = RSAENCRYPTED;
                             break;
                         default:

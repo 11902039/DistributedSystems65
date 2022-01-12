@@ -35,7 +35,6 @@ public class MailboxServer implements IMailboxServer, Runnable {
     private ListenerThread dmapThread;
     private String domain;
     private Config userConfig;
-    private String componentID;
 
     private INameserverRemote rootNameServer;
 
@@ -55,7 +54,6 @@ public class MailboxServer implements IMailboxServer, Runnable {
      * @param out the output stream to write console output to
      */
     public MailboxServer(String componentId, Config config, InputStream in, PrintStream out) {
-        this.componentID = componentId;
         this.config = config;
         this.userConfig = new Config(config.getString("users.config"));
         this.domain = config.getString("domain");
@@ -71,9 +69,9 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
             rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
         } catch (RemoteException e) {
-            System.err.println("Error while trying to locate Registry of Root Nameserver");
+            System.err.println(e.getMessage());
         } catch (NotBoundException e) {
-            System.err.println("Error while trying to lookup Root Nameserver");
+            System.err.println(e.getMessage());
         }
 
         Set<String> userlist = this.userConfig.listKeys();
@@ -84,7 +82,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         try {
             serverSocketDMTP = new ServerSocket(config.getInt("dmtp.tcp.port"));
 
-            this.dmtpThread = new ListenerThread(serverSocketDMTP, this, true, componentID);
+            this.dmtpThread = new ListenerThread(serverSocketDMTP, this, true);
             this.dmtpThread.start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
@@ -93,7 +91,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         try {
             serverSocketDMAP = new ServerSocket(config.getInt("dmap.tcp.port"));
 
-            this.dmapThread = new ListenerThread(serverSocketDMAP, this, false, componentID);
+            this.dmapThread = new ListenerThread(serverSocketDMAP, this, false);
             this.dmapThread.start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
