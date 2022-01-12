@@ -24,12 +24,14 @@ public class ListenerThread extends Thread implements IListenerThread {
     private final boolean DMTP; //true if DMTP Listener and false if DMAP
     private ExecutorService ThreadPool;
     private ConcurrentLinkedQueue<Socket> sockets = new ConcurrentLinkedQueue<>();
+    private String componentID;
 
-    public ListenerThread(ServerSocket serverSocket, MailboxServer mailboxServer, boolean DMTP) {
+    public ListenerThread(ServerSocket serverSocket, MailboxServer mailboxServer, boolean DMTP, String componentID) {
         this.serverSocket = serverSocket;
         listening = true;
         this.DMTP = DMTP;
         this.mailboxServer = mailboxServer;
+        this.componentID = componentID;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class ListenerThread extends Thread implements IListenerThread {
                 if (DMTP)
                     t = new dmtpThread(serverSocket.accept(), this);
                 else
-                    t = new dmapThread(serverSocket.accept(), this);
+                    t = new dmapThread(serverSocket.accept(), this, componentID);
                 ThreadPool.submit(t);
             }
         }catch (SocketException e) {

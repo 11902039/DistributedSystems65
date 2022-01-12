@@ -35,6 +35,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
     private ListenerThread dmapThread;
     private String domain;
     private Config userConfig;
+    private String componentID;
 
     private INameserverRemote rootNameServer;
 
@@ -60,6 +61,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         shell = new Shell(in, out);
         shell.register(this);
         shell.setPrompt(componentId + "---> ");
+        this.componentID = componentId;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         try {
             serverSocketDMTP = new ServerSocket(config.getInt("dmtp.tcp.port"));
 
-            this.dmtpThread = new ListenerThread(serverSocketDMTP, this, true);
+            this.dmtpThread = new ListenerThread(serverSocketDMTP, this, true, componentID);
             this.dmtpThread.start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
@@ -91,7 +93,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         try {
             serverSocketDMAP = new ServerSocket(config.getInt("dmap.tcp.port"));
 
-            this.dmapThread = new ListenerThread(serverSocketDMAP, this, false);
+            this.dmapThread = new ListenerThread(serverSocketDMAP, this, false, componentID);
             this.dmapThread.start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
