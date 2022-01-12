@@ -49,15 +49,13 @@ public class AEScrypting {
     public String Encrypt( String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
         //creating a Cypher for the procedure
-        Cipher cipherAES = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipherAES = Cipher.getInstance("AES/CTR/NoPadding");
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
         cipherAES.init(Cipher.ENCRYPT_MODE,secretKey,ivSpec);
 
-        //converting to base64
-        byte[] converted = Base64.getDecoder().decode(message);
 
         //encrypting
-        byte[] encryptedMessage = cipherAES.doFinal(converted);
+        byte[] encryptedMessage = cipherAES.doFinal(message.getBytes(StandardCharsets.UTF_8));
 
         //encoding the encrypted base64 into string
         String messageToSend = Base64.getEncoder().encodeToString(encryptedMessage);
@@ -68,7 +66,7 @@ public class AEScrypting {
     public String Decrypt( String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
         //creating a Cypher for the procedure
-        Cipher cipherAES = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        Cipher cipherAES = Cipher.getInstance("AES/CTR/NoPadding");
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
         cipherAES.init(Cipher.DECRYPT_MODE,secretKey,ivSpec);
 
@@ -79,7 +77,7 @@ public class AEScrypting {
         byte[] decryptedMessage = cipherAES.doFinal(encryptedMessage);
 
         //encoding the decrypted base64 into string
-        String result = Base64.getEncoder().encodeToString(decryptedMessage);
+        String result = new String(decryptedMessage,StandardCharsets.UTF_8);
 
         return result;
     }

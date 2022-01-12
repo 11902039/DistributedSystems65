@@ -13,11 +13,13 @@ import dslab.util.Config;
 import dslab.util.Keys;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 
 
@@ -62,8 +64,10 @@ public class MessageClient implements IMessageClient, Runnable {
         this.componentId = componentId;
         this.in = in;
         this.out = out;
+        this.random = new SecureRandom();
         shell = new Shell(in, out);
         shell.register(this);
+
 
     }
 
@@ -100,34 +104,47 @@ public class MessageClient implements IMessageClient, Runnable {
 
 
                             //getting the Key based on the componentID
-                            String privateKeyFileName = "keys/client/"+serverComponentId+"_pub.der";
+                            String privateKeyFileName = "dslab21-group65-a2/keys/client/"+serverComponentId+"_pub.der";
+                            //String privateKeyFileName = "keys/client/"+serverComponentId+"_pub.der";
                             File serverKeyFile = new File(privateKeyFileName);
                             serverPublicKey = Keys.readPublicKey(serverKeyFile);
 
-                            //generating the challenge, a random 32byte number
+                            //generating the challenge, a random 32byte number, and converting it to string right after
                             challenge = new byte[32];
                             random.nextBytes(challenge);
+                            String challengeString = Base64.getEncoder().encodeToString(challenge);
 
                             //creating the AES crypter on the client side
                             AEScrypting crypter = new AEScrypting();
 
-                            //getting the secret key from the crypter
+                            //getting the secret key from the crypter, and converting it to String
                             secretKey = crypter.getSecretKey();
+                            shell.out().println("SecretKey on client side: " + Arrays.toString(secretKey.getEncoded()));
+                            String secretKeyString = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-                            //getting iv from the crypter
+                            //getting iv from the crypter, and converting to String
                             iv = crypter.getIv();
+                            shell.out().println("iv on client side: " + Arrays.toString(iv));
+                            String ivString = Base64.getEncoder().encodeToString(iv);
 
                             //generating the RSA cipher
-                            Cipher cipherRSA = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+                            Cipher cipherRSA = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 
                             //setting it to encrypt mode
                             cipherRSA.init(Cipher.ENCRYPT_MODE,serverPublicKey);
 
-                            String message = "ok " + challenge + " " +  secretKey.getEncoded() + " " + iv;
+                            String message = "ok " + challengeString + " " +  secretKeyString + " " + ivString;
 
-                            shell.out().println("STARTED: ok " + challenge + " " + secretKey.getEncoded() + " " + iv);
+                            shell.out().println("STARTED: "+message);
 
-                            String messageToSend = crypter.Encrypt(message);
+                            //converting to base64
+                            // byte[] converted = Base64.getDecoder().decode(message);
+
+                            //encrypting
+                            byte[] encryptedMessage = cipherRSA.doFinal(message.getBytes(StandardCharsets.UTF_8));
+
+                            //encoding the encrypted base64 into string
+                            String messageToSend = Base64.getEncoder().encodeToString(encryptedMessage);
 
 
                             //TODO: Implement the cryptographic functions
@@ -142,11 +159,15 @@ public class MessageClient implements IMessageClient, Runnable {
                         }
                         break;
                     case CHALLENGEGIVEN:
-                        answer = AESDecryptStub(answer);
+                        AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
+                        //shell.out().println("before decrypting: "+answer);
+                        answer = AEScrypter.Decrypt(answer);
+                        //shell.out().println("after decrypting: "+answer);
                         parts = answer.split("\\s");
                         if (answer.startsWith("ok") && parts.length == 2)
                         {
-                            if (parts[1].equals(challenge))
+                            byte[] returnedChallenge = Base64.getDecoder().decode(parts[1]);
+                            if (Arrays.equals(returnedChallenge, challenge))
                             {
                                 shell.out().println("CHALLENGEGIVEN: ok");
                                 writer.println(AESEncryptStub("ok"));
@@ -184,7 +205,9 @@ public class MessageClient implements IMessageClient, Runnable {
         } catch (IOException e) {
             // you should properly handle all other exceptions
             throw new UncheckedIOException(e);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         } finally {
             if (DMAPSocket != null && !DMAPSocket.isClosed()) {

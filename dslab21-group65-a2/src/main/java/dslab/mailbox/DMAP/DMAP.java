@@ -2,10 +2,19 @@ package dslab.mailbox.DMAP;
 
 import dslab.Message.Message;
 import dslab.mailbox.tcp.dmapThread;
+import dslab.util.AEScrypting;
+import dslab.util.Keys;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.util.*;
 
 public class DMAP {
 
@@ -25,6 +34,9 @@ public class DMAP {
     private HashMap<Integer,Message> list;
     private Message message;
     private String componentID;
+
+    private byte[] iv;
+    private SecretKey secretKey;
 
     public DMAP(dmapThread thread, String componentID){
         this.thread = thread;
@@ -46,7 +58,7 @@ public class DMAP {
         return message;
     }
 
-    public String processInput(String input){
+    public String processInput(String input) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         String output = "waiting for client's message";
 
         switch(state){
@@ -72,9 +84,24 @@ public class DMAP {
                 }
             break;
             case RSAENCRYPTED:
-                input = RSADecryptStub(input);
-                String newInput = input;
-                String[] splitInput = input.split("\\s");
+                File privKeyFile = new File("dslab21-group65-a2/keys/server/"+componentID+".der");
+                //File privKeyFile = new File("keys/server/"+componentID+".der");
+                PrivateKey privateKey = Keys.readPrivateKey(privKeyFile);
+                Cipher RSAcipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                RSAcipher.init(Cipher.DECRYPT_MODE,privateKey);
+
+                //decoding the message to base64
+                byte[] b64input = Base64.getDecoder().decode(input);
+
+                //decrypting
+                byte[] decryptedInput = RSAcipher.doFinal(b64input);
+
+                //making a string
+                String decryptedString = new String(decryptedInput, StandardCharsets.UTF_8);
+
+
+                String newInput = decryptedString;
+                String[] splitInput = decryptedString.split("\\s");
 
                 if(splitInput.length > 1)
                     newInput = splitInput[0];
@@ -86,9 +113,25 @@ public class DMAP {
                             break;
                         }
                         String clientChallenge = splitInput[1];
-                        String secretKey = splitInput[2];
-                        String iv = splitInput[2];
-                        output = "ok " + clientChallenge;
+
+                        //converting the keystring into the key
+                        String secretKeyString = splitInput[2];
+                        byte[] decodedSecretKey = Base64.getDecoder().decode(secretKeyString);
+                        secretKey = new SecretKeySpec(decodedSecretKey, 0, decodedSecretKey.length, "AES");
+                        System.out.println("SecretKey on server side: " + Arrays.toString(secretKey.getEncoded()));
+
+                        String ivString = splitInput[3];
+                        iv = Base64.getDecoder().decode(ivString);
+                        System.out.println("iv on server side: " + Arrays.toString(iv));
+
+                        AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
+
+                        String returnmessage = "ok " + clientChallenge;
+                        //System.out.println("return before cyphering: " + returnmessage);
+                        output = AEScrypter.Encrypt(returnmessage);
+                        //System.out.println("return after cyphering: " + output);
+
+                        //output = "ok " + clientChallenge;
                         state = CHALLENGERESPONSE;
                         break;
                     default:
