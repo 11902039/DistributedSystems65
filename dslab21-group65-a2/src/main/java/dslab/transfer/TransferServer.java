@@ -72,9 +72,9 @@ public class TransferServer implements ITransferServer, Runnable {
 
             rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
         } catch (RemoteException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error while trying to locate Registry of Root Nameserver");
         } catch (NotBoundException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error while trying to lookup Root Nameserver");
         }
 
         try {

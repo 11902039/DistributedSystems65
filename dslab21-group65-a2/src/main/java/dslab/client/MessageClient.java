@@ -8,12 +8,18 @@ import at.ac.tuwien.dsg.orvell.Shell;
 import at.ac.tuwien.dsg.orvell.StopShellException;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
+import dslab.util.AEScrypting;
 import dslab.util.Config;
+import dslab.util.Keys;
 
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
 import java.util.ArrayList;
+import java.util.Base64;
 
 
 public class MessageClient implements IMessageClient, Runnable {
@@ -27,9 +33,13 @@ public class MessageClient implements IMessageClient, Runnable {
     private BufferedReader reader;
     private PrintWriter writer;
     private String serverComponentId;
-    private int secretKey;
+    private PublicKey serverPublicKey;
+    private SecretKey secretKey;
+    private SecureRandom random;
+    private KeyGenerator keygen;
+    private byte[] challenge;
+    private byte[] iv;
     private int AESKey;
-    private int iv;
     private static final int NOTSTARTED = 0;
     private static final int STARTED = 1;
     private static final int CHALLENGEGIVEN = 2;
@@ -58,13 +68,18 @@ public class MessageClient implements IMessageClient, Runnable {
 
     }
 
+    private SecretKey generateAESKey() throws NoSuchAlgorithmException {
+        KeyGenerator generator = KeyGenerator.getInstance("AES");
+        generator.init(128); // The AES key size in number of bits
+        return generator.generateKey();
+    }
+
     @Override
     public void run() {
         String answer;
         boolean started = false, challengeCorrect = false;
-        //byte[] challenge = new byte[32];
+        byte[] challenge = new byte[32];
         //new SecureRandom().nextBytes(challenge);
-        String challenge = "xd";
 
         shell.out().println("Starting the client for " + config.getString("transfer.email") + "...");
 
@@ -90,11 +105,41 @@ public class MessageClient implements IMessageClient, Runnable {
                         if (answer.startsWith("ok") && parts.length == 2) {
                             serverComponentId = parts[1];
                             shell.out().println("STARTED: ok " + challenge + " " + secretKey + " " + iv);
+
+                            //getting the Key based on the componentID
+                            File serverKeyFile = new File("keys/client/"+serverComponentId+"_pub.der");
+                            serverPublicKey = Keys.readPublicKey(serverKeyFile);
+
+                            //generating the challenge, a random 32byte number
+                            challenge = new byte[32];
+                            random.nextBytes(challenge);
+
+                            AEScrypting crypter = new AEScrypting();
+
+                            //generating the secret key
+                            secretKey = crypter.getSecretKey();
+
+                            //generating the iv, a random 16byte number
+                            iv = crypter.getIv();
+
+                            //generating the RSA cipher
+                            Cipher cipherRSA = Cipher.getInstance("RSA/ECB/PKCS5Padding");
+
+                            //setting it to encrypt mode
+                            cipherRSA.init(Cipher.ENCRYPT_MODE,serverPublicKey);
+
+                            String message = "ok " + challenge + " " +  secretKey.getEncoded() + " " + iv;
+
+                            String messageToSend = crypter.Encrypt(message);
+
+
                             //TODO: Implement the cryptographic functions
-                            iv = 2137;
+                            //iv = 2137;
                             // secretKey = generateSecretKey();
                             // AESKey = generateAESKey(iv);
-                            writer.println(RSAEncryptStub("ok " + challenge + " " + secretKey + " " + iv));
+                            //writer.println(RSAEncryptStub("ok " + challenge + " " + secretKey + " " + iv));
+
+                            writer.println(messageToSend);
                             writer.flush();
                             state = CHALLENGEGIVEN;
                         }
@@ -142,6 +187,8 @@ public class MessageClient implements IMessageClient, Runnable {
         } catch (IOException e) {
             // you should properly handle all other exceptions
             throw new UncheckedIOException(e);
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
         } finally {
             if (DMAPSocket != null && !DMAPSocket.isClosed()) {
                 try {
