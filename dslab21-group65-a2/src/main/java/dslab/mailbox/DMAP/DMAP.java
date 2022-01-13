@@ -58,14 +58,22 @@ public class DMAP {
         return message;
     }
 
-    public String DecryptString(String encrypted) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        AEScrypting decrypter = new AEScrypting(iv, secretKey);
-        return decrypter.Decrypt(encrypted);
+    public String DecryptString(String string) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        if(state == PLAIN || state == RSAENCRYPTED) {
+            return string;
+        }
+        else{
+            AEScrypting decrypter = new AEScrypting(iv, secretKey);
+            return decrypter.Decrypt(string);
+        }
     }
 
-    public String EncryptString(String encrypted) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        AEScrypting encrypter = new AEScrypting(iv, secretKey);
-        return encrypter.Encrypt(encrypted);
+    public String EncryptString(String string) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        if (state != PLAIN && state != RSAENCRYPTED) {
+            AEScrypting encrypter = new AEScrypting(iv, secretKey);
+            return encrypter.Encrypt(string);
+        }
+        return string;
     }
 
     public String processInput(String input) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
@@ -77,6 +85,8 @@ public class DMAP {
             AEScrypting decrypter = new AEScrypting(iv, secretKey);
             input = decrypter.Decrypt(input);
         }
+
+        System.out.println("the message from the client is: " + input);
 
         switch(state){
             case PLAIN:
@@ -143,10 +153,7 @@ public class DMAP {
 
                         AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
 
-                        String returnmessage = "ok " + clientChallenge;
-                        //System.out.println("return before cyphering: " + returnmessage);
-                        output = returnmessage;
-                        //System.out.println("return after cyphering: " + output);
+                        output = "ok " + clientChallenge;
 
                         //output = "ok " + clientChallenge;
                         state = CHALLENGERESPONSE;
@@ -342,12 +349,12 @@ public class DMAP {
                 }
                 break;
         }
-        if(state == PLAIN || state == RSAENCRYPTED) {
-            return output;
-        }
-        else{
+        System.out.println(output);
+        if (state != PLAIN && state != RSAENCRYPTED) {
             AEScrypting encrypter = new AEScrypting(iv, secretKey);
-            return encrypter.Encrypt(output);
+            output = encrypter.Encrypt(output);
         }
+        System.out.println("the message sent to the client is: " + output);
+        return output;
     }
 }

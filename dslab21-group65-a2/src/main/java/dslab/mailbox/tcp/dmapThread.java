@@ -71,7 +71,7 @@ public class dmapThread extends Thread{
                     if (protocol.DecryptString(outputLine).startsWith("from"))
                         for(int i = 0; i <= 4; i++){
                             outputLine = protocol.processInput(Integer.toString(i));
-                            outputLine = protocol.EncryptString(outputLine);
+                            //outputLine = protocol.EncryptString(outputLine);
                             writer.println(outputLine);
                             writer.flush();
                         }
