@@ -81,7 +81,7 @@ public class DMAP {
 
         if(state == PLAIN || state == RSAENCRYPTED) {
         }
-        else{
+        else if (input != null) {
             AEScrypting decrypter = new AEScrypting(iv, secretKey);
             input = decrypter.Decrypt(input);
         }
@@ -111,8 +111,8 @@ public class DMAP {
                 }
             break;
             case RSAENCRYPTED:
-                File privKeyFile = new File("dslab21-group65-a2/keys/server/"+componentID+".der");
-                //File privKeyFile = new File("keys/server/"+componentID+".der");
+                //File privKeyFile = new File("dslab21-group65-a2/keys/server/"+componentID+".der");
+                File privKeyFile = new File("keys/server/"+componentID+".der");
                 PrivateKey privateKey = Keys.readPrivateKey(privKeyFile);
                 Cipher RSAcipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
                 RSAcipher.init(Cipher.DECRYPT_MODE,privateKey);
@@ -332,8 +332,6 @@ public class DMAP {
                 }
                 break;
             case LISTING: //State, expects null answers from thread to keep listing mails
-                AEScrypting AEScrypter6 = new AEScrypting(iv,secretKey);
-                input = AEScrypter6.Decrypt(input);
                 if (input == null){
                     if(!list.isEmpty()){
                        int id = list.keySet().iterator().next();

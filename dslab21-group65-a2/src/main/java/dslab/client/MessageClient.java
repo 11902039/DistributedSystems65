@@ -104,8 +104,8 @@ public class MessageClient implements IMessageClient, Runnable {
 
 
                             //getting the Key based on the componentID
-                            String privateKeyFileName = "dslab21-group65-a2/keys/client/"+serverComponentId+"_pub.der";
-                            //String privateKeyFileName = "keys/client/"+serverComponentId+"_pub.der";
+                            //String privateKeyFileName = "dslab21-group65-a2/keys/client/"+serverComponentId+"_pub.der";
+                            String privateKeyFileName = "keys/client/"+serverComponentId+"_pub.der";
                             File serverKeyFile = new File(privateKeyFileName);
                             serverPublicKey = Keys.readPublicKey(serverKeyFile);
 
@@ -255,7 +255,11 @@ public class MessageClient implements IMessageClient, Runnable {
         }
         for (String id : ids) {
             shell.out().println("message no. " + id);
-            writer.println("show " + id);
+            try {
+            writer.println(AEScrypter.Encrypt("show " + id));
+            } catch (NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
             writer.flush();
             try {
                 while (!(answer = AEScrypter.Decrypt(reader.readLine())).equals("ok")) {

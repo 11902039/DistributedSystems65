@@ -58,11 +58,13 @@ public class dmapThread extends Thread{
             outputLine = protocol.processInput(null);
             writer.println(outputLine);
             writer.flush();
-
             while ((inputLine = reader.readLine()) != null) {
+                System.out.println("DMAPTHREAD inputline: " + protocol.DecryptString(inputLine));
                 outputLine = protocol.processInput(inputLine);
+                System.out.println("DMAPTHREAD outputline: " + protocol.DecryptString(outputLine));
+                if(protocol.DecryptString(outputLine) != null) {
 
-                if(outputLine != null) {
+                    System.out.println("inside");
                     writer.println(outputLine);
                     writer.flush();
 
@@ -70,8 +72,8 @@ public class dmapThread extends Thread{
                     //if output starts with from, send 0,1,2,3,4 for other lines
                     if (protocol.DecryptString(outputLine).startsWith("from"))
                         for(int i = 0; i <= 4; i++){
-                            outputLine = protocol.processInput(Integer.toString(i));
-                            //outputLine = protocol.EncryptString(outputLine);
+
+                            outputLine = protocol.processInput(protocol.EncryptString(Integer.toString(i)));
                             writer.println(outputLine);
                             writer.flush();
                         }
@@ -81,12 +83,17 @@ public class dmapThread extends Thread{
                     }
 
 
-                    while(outputLine!=null && (Character.isDigit(protocol.DecryptString(outputLine).charAt(0)))){ //Only list entries start with numbers
+                    while(protocol.DecryptString(outputLine) != null && (Character.isDigit(protocol.DecryptString(outputLine).charAt(0)))){
+                        System.out.println("inside 2");
+                        //Only list entries start with numbers
                         outputLine = protocol.processInput(null); //let protocol list all mails
+                        System.out.println("inside 3 " + outputLine);
+                        System.out.println("inside 3 " + protocol.DecryptString(outputLine));
                         if(outputLine!=null) { //output is null when all lines are listed.
                             writer.println(outputLine);
                             writer.flush();
                         }
+                        //outputLine = protocol.DecryptString(outputLine);
                     }
                 }
             }
