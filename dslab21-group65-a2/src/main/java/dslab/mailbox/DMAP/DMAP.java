@@ -58,6 +58,16 @@ public class DMAP {
         return message;
     }
 
+    public String DecryptString(String encrypted) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        AEScrypting decrypter = new AEScrypting(iv, secretKey);
+        return decrypter.Decrypt(encrypted);
+    }
+
+    public String EncryptString(String encrypted) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        AEScrypting encrypter = new AEScrypting(iv, secretKey);
+        return encrypter.Encrypt(encrypted);
+    }
+
     public String processInput(String input) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         String output = "waiting for client's message";
 

@@ -68,19 +68,20 @@ public class dmapThread extends Thread{
 
 
                     //if output starts with from, send 0,1,2,3,4 for other lines
-                    if (outputLine.startsWith("from"))
+                    if (protocol.DecryptString(outputLine).startsWith("from"))
                         for(int i = 0; i <= 4; i++){
                             outputLine = protocol.processInput(Integer.toString(i));
+                            outputLine = protocol.EncryptString(outputLine);
                             writer.println(outputLine);
                             writer.flush();
                         }
 
-                    if (outputLine.equalsIgnoreCase("ok bye") || outputLine.startsWith("error protocol")) {
+                    if (protocol.DecryptString(outputLine).equalsIgnoreCase("ok bye") || protocol.DecryptString(outputLine).startsWith("error protocol")) {
                         break; //break reading loop if user quits or if there's an error
                     }
 
 
-                    while(outputLine!=null && (Character.isDigit(outputLine.charAt(0)))){ //Only list entries start with numbers
+                    while(outputLine!=null && (Character.isDigit(protocol.DecryptString(outputLine).charAt(0)))){ //Only list entries start with numbers
                         outputLine = protocol.processInput(null); //let protocol list all mails
                         if(outputLine!=null) { //output is null when all lines are listed.
                             writer.println(outputLine);
