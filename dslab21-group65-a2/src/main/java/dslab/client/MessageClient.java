@@ -14,6 +14,7 @@ import dslab.util.Keys;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -290,6 +291,17 @@ public class MessageClient implements IMessageClient, Runnable {
         shell.out().println(answer);
     }
 
+    public String makeHash(String message) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
+        File hmackey = new File("dslab21-group65-a2/keys/hmac.key");
+        SecretKeySpec key = Keys.readSecretKey(hmackey);
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(key);
+        byte[] hashed = mac.doFinal(messageBytes);
+        String output = Base64.getEncoder().encodeToString(hashed);
+        return output;
+    }
+
     public String hashStub (String message)
     {
         return message;
@@ -345,7 +357,7 @@ public class MessageClient implements IMessageClient, Runnable {
                 {
                     if(parts.length > 1) {
                         //TODO: implement the hash function
-                        if (parts[1].equals(hashStub(messageBuilder.toString()))) {
+                        if (parts[1].equals(makeHash(messageBuilder.toString()))) {
                             shell.out().println("ok");
                         }
                     }
@@ -404,7 +416,8 @@ public class MessageClient implements IMessageClient, Runnable {
                             break;
                         case 4:
                             //TODO: implement the hash function;
-                            writerDMTP.println("hash " + hashStub(data));
+                            String msg = String.join("\n", config.getString("transfer.email"), to, subject, data);
+                            writerDMTP.println("hash " + makeHash(msg));
                             writerDMTP.flush();
                             count++;
                             break;
@@ -436,6 +449,10 @@ public class MessageClient implements IMessageClient, Runnable {
         } catch (IOException e) {
             // you should properly handle all other exceptions
             throw new UncheckedIOException(e);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
         }
 
     }
