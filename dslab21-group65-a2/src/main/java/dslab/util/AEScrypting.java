@@ -70,6 +70,7 @@ public class AEScrypting {
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
         cipherAES.init(Cipher.DECRYPT_MODE,secretKey,ivSpec);
 
+
         //decoding string into base64
         byte[] encryptedMessage = Base64.getDecoder().decode(message);
 
