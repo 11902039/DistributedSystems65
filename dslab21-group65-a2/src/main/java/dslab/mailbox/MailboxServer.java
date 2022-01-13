@@ -70,10 +70,10 @@ public class MailboxServer implements IMailboxServer, Runnable {
             Registry registry = LocateRegistry.getRegistry(config.getString("registry.host"), config.getInt("registry.port"));
 
             rootNameServer = (INameserverRemote) registry.lookup(config.getString("root_id"));
-        } catch (RemoteException e) {
-            System.err.println(e.getMessage());
         } catch (NotBoundException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error while looking for server-remote-object.");
+        } catch (RemoteException e) {
+            System.err.println("Error while obtaining registry/server-remote-object.");
         }
 
         Set<String> userlist = this.userConfig.listKeys();

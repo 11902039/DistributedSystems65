@@ -28,6 +28,7 @@ public class DMAP {
     private static final int LISTING = 3;
 
     private int state = PLAIN;
+    private boolean encrypt;
     private String user;
     private dmapThread thread;
 
@@ -41,6 +42,7 @@ public class DMAP {
     public DMAP(dmapThread thread, String componentID){
         this.thread = thread;
         this.componentID = componentID;
+        this.encrypt = false;
     }
 
     public String AESEncryptStub(String message)
@@ -59,7 +61,7 @@ public class DMAP {
     }
 
     public String DecryptString(String string) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        if(state == PLAIN || state == RSAENCRYPTED) {
+        if(!this.encrypt) {
             return string;
         }
         else{
@@ -69,7 +71,7 @@ public class DMAP {
     }
 
     public String EncryptString(String string) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        if (state != PLAIN && state != RSAENCRYPTED) {
+        if (this.encrypt) {
             AEScrypting encrypter = new AEScrypting(iv, secretKey);
             return encrypter.Encrypt(string);
         }
@@ -79,14 +81,14 @@ public class DMAP {
     public String processInput(String input) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         String output = "waiting for client's message";
 
-        if(state == PLAIN || state == RSAENCRYPTED) {
+        if(!this.encrypt) {
         }
         else if (input != null) {
             AEScrypting decrypter = new AEScrypting(iv, secretKey);
             input = decrypter.Decrypt(input);
         }
 
-        System.out.println("the message from the client is: " + input);
+        //System.out.println("the message from the client is: " + input);
 
         switch(state){
             case PLAIN:
@@ -103,6 +105,41 @@ public class DMAP {
                         case "startsecure":
                             output = "ok " + componentID;
                             state = RSAENCRYPTED;
+                            break;
+                        case "login":
+                            if(splitInput.length < 3){
+                                output = "error not enough data";
+                                break;
+                            }
+                            String name = splitInput[1];
+                            String password = splitInput[2];
+
+                            //check user
+                            int ans = thread.checkLogin(name,password);
+
+                            switch(ans){
+                                case 0:
+                                    output = "error unknown user";
+                                    break;
+                                case 1:
+                                    output = "error wrong password";
+                                    break;
+                                case 2:
+                                    output = "ok";
+                                    state = LOGGEDIN;
+                                    user = name;
+                                    break;
+                            }
+                            break;
+
+                        case "show":
+                        case "delete":
+                        case "list":
+                        case "logout":
+                            output = "error not logged in";
+                            break;
+                        case "quit":
+                            output = "ok bye";
                             break;
                         default:
                             output = "PLAIN: error protocol error";
@@ -145,17 +182,18 @@ public class DMAP {
                         String secretKeyString = splitInput[2];
                         byte[] decodedSecretKey = Base64.getDecoder().decode(secretKeyString);
                         secretKey = new SecretKeySpec(decodedSecretKey, 0, decodedSecretKey.length, "AES");
-                        System.out.println("SecretKey on server side: " + Arrays.toString(secretKey.getEncoded()));
+                        //System.out.println("SecretKey on server side: " + Arrays.toString(secretKey.getEncoded()));
 
                         String ivString = splitInput[3];
                         iv = Base64.getDecoder().decode(ivString);
-                        System.out.println("iv on server side: " + Arrays.toString(iv));
+                        //System.out.println("iv on server side: " + Arrays.toString(iv));
 
                         AEScrypting AEScrypter = new AEScrypting(iv,secretKey);
 
                         output = "ok " + clientChallenge;
 
                         //output = "ok " + clientChallenge;
+                        this.encrypt = true;
                         state = CHALLENGERESPONSE;
                         break;
                     default:
@@ -164,12 +202,12 @@ public class DMAP {
                 }
                 break;
             case CHALLENGERESPONSE:
-                System.out.println("DMAP CHALLENGERESPONSE");
+                //System.out.println("DMAP CHALLENGERESPONSE");
                 splitInput = input.split("\\s");
                 switch(input.toLowerCase(Locale.ROOT)) {
                     case "ok":
                         if (splitInput.length == 1) {
-                            System.out.println("DMAP LOGGEDOUT SET");
+                            //System.out.println("DMAP LOGGEDOUT SET");
                             state = LOGGEDOUT;
                             break;
                         }
@@ -181,7 +219,7 @@ public class DMAP {
             case LOGGEDOUT:
                 newInput = input;
                 splitInput = input.split("\\s");
-                System.out.println("DMAP LOGGEDOUT");
+                //System.out.println("DMAP LOGGEDOUT");
                     if(splitInput.length > 1)
                         newInput = splitInput[0];
                     switch(newInput.toLowerCase(Locale.ROOT)){
@@ -226,7 +264,7 @@ public class DMAP {
                     }
                     break;
             case LOGGEDIN:
-                System.out.println("DMAP LOGGEDIN: input: " + input);
+                //System.out.println("DMAP LOGGEDIN: input: " + input);
                 if(input != null){
                      newInput = input;
                      splitInput = input.split("\\s");
@@ -347,12 +385,12 @@ public class DMAP {
                 }
                 break;
         }
-        System.out.println(output);
-        if (state != PLAIN && state != RSAENCRYPTED) {
+        //System.out.println(output);
+        if (this.encrypt) {
             AEScrypting encrypter = new AEScrypting(iv, secretKey);
             output = encrypter.Encrypt(output);
         }
-        System.out.println("the message sent to the client is: " + output);
+        //System.out.println("the message sent to the client is: " + output);
         return output;
     }
 }

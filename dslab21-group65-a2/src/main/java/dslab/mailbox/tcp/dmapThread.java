@@ -59,12 +59,12 @@ public class dmapThread extends Thread{
             writer.println(outputLine);
             writer.flush();
             while ((inputLine = reader.readLine()) != null) {
-                System.out.println("DMAPTHREAD inputline: " + protocol.DecryptString(inputLine));
+                //System.out.println("DMAPTHREAD inputline: " + protocol.DecryptString(inputLine));
                 outputLine = protocol.processInput(inputLine);
-                System.out.println("DMAPTHREAD outputline: " + protocol.DecryptString(outputLine));
+                //System.out.println("DMAPTHREAD outputline: " + protocol.DecryptString(outputLine));
                 if(protocol.DecryptString(outputLine) != null) {
 
-                    System.out.println("inside");
+                   //System.out.println("inside");
                     writer.println(outputLine);
                     writer.flush();
 
@@ -84,11 +84,11 @@ public class dmapThread extends Thread{
 
 
                     while(protocol.DecryptString(outputLine) != null && (Character.isDigit(protocol.DecryptString(outputLine).charAt(0)))){
-                        System.out.println("inside 2");
+                        //System.out.println("inside 2");
                         //Only list entries start with numbers
                         outputLine = protocol.processInput(null); //let protocol list all mails
-                        System.out.println("inside 3 " + outputLine);
-                        System.out.println("inside 3 " + protocol.DecryptString(outputLine));
+                        //System.out.println("inside 3 " + outputLine);
+                        //System.out.println("inside 3 " + protocol.DecryptString(outputLine));
                         if(outputLine!=null) { //output is null when all lines are listed.
                             writer.println(outputLine);
                             writer.flush();
@@ -100,7 +100,7 @@ public class dmapThread extends Thread{
             this.parent.removeSocket(client);
             client.close();
         } catch (SocketException e) {
-            System.out.println("SocketException while handling socket: " + e.getMessage());
+            System.err.println("SocketException while handling socket: " + e.getMessage());
             return;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
