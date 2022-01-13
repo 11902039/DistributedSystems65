@@ -327,7 +327,7 @@ public class MessageClient implements IMessageClient, Runnable {
             while (!(answer = AEScrypter.Decrypt(reader.readLine())).equals("ok")) {
                 //shell.out().println(answer);
                 String[] parts = answer.split("\\s");
-                if(answer.startsWith("data")) {
+                if(answer.startsWith("data") || answer.startsWith("subject")) {
                     for (int i = 1; i < parts.length; i++) {
                         messageBuilder.append(parts[i]);
                         if(i + 1 != parts.length) {
@@ -335,6 +335,11 @@ public class MessageClient implements IMessageClient, Runnable {
                         }
                         //shell.out().println(messageBuilder.toString());
                     }
+                }
+                else if (!answer.startsWith("hash"))
+                {
+                    messageBuilder.append(parts[1]);
+                    messageBuilder.append("\n");
                 }
                 if(answer.startsWith("hash"))
                 {
