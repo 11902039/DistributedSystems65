@@ -103,9 +103,9 @@ public class ClientThread extends Thread{
                 serverWriter.flush();
             }
         } catch (UnknownHostException e) {
-            System.out.println("Cannot connect to host: " + e.getMessage());
+            System.err.println("Cannot connect to host: " + e.getMessage());
         } catch (SocketException e) {
-            System.out.println("SocketException while handling socket: " + e.getMessage());
+            System.err.println("SocketException while handling socket: " + e.getMessage());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {

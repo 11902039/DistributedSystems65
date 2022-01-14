@@ -26,7 +26,7 @@ public class DMTP {
 
     public String processInput(String input) {
         String output = "err0r 0utput";
-        System.out.println("input: " + input);
+        //System.out.println("input: " + input);
         switch(state) {
             case WAITING:
                 if(input == null)
@@ -192,7 +192,7 @@ public class DMTP {
                 break;
         }
 
-        System.out.println("output: " + output);
+        //System.out.println("output: " + output);
         return output;
     }
 

@@ -89,15 +89,6 @@ public class Nameserver implements INameserver, INameserverRemote {
                 throw new RuntimeException(e.getMessage());
             }
         }
-        /* Comment??
-        String name;
-        if(domain == null){
-            name = "root nameserver";
-        } else {
-            name = domain + " nameserver";
-        }
-        shell.out().println("# " + name);
-         */
 
         shell.run();
     }
@@ -112,10 +103,6 @@ public class Nameserver implements INameserver, INameserverRemote {
         for (String server: childServers.keySet()) {
             shell.out().println(counter + ". " + server);
             counter++;
-        }
-
-        for (INameserverRemote server: childServers.values()) {
-            //somehow recursively call nameservers?
         }
     }
 
@@ -175,7 +162,6 @@ public class Nameserver implements INameserver, INameserverRemote {
 
     @Override
     public void registerNameserver(String domain, INameserverRemote nameserver) throws RemoteException, AlreadyRegisteredException, InvalidDomainException {
-        System.out.println("Help");
         String[] parts = domain.split("\\.");
 
         //still a dot in the domain

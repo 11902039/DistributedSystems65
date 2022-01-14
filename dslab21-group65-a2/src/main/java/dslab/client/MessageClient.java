@@ -68,6 +68,7 @@ public class MessageClient implements IMessageClient, Runnable {
         this.random = new SecureRandom();
         shell = new Shell(in, out);
         shell.register(this);
+        shell.setPrompt(componentId + "---> ");
 
 
     }
@@ -120,12 +121,12 @@ public class MessageClient implements IMessageClient, Runnable {
 
                             //getting the secret key from the crypter, and converting it to String
                             secretKey = crypter.getSecretKey();
-                            shell.out().println("SecretKey on client side: " + Arrays.toString(secretKey.getEncoded()));
+                            //shell.out().println("SecretKey on client side: " + Arrays.toString(secretKey.getEncoded()));
                             String secretKeyString = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
                             //getting iv from the crypter, and converting to String
                             iv = crypter.getIv();
-                            shell.out().println("iv on client side: " + Arrays.toString(iv));
+                            //shell.out().println("iv on client side: " + Arrays.toString(iv));
                             String ivString = Base64.getEncoder().encodeToString(iv);
 
                             //generating the RSA cipher
@@ -136,7 +137,7 @@ public class MessageClient implements IMessageClient, Runnable {
 
                             String message = "ok " + challengeString + " " +  secretKeyString + " " + ivString;
 
-                            shell.out().println("STARTED: "+message);
+                            //shell.out().println("STARTED: "+message);
 
                             //converting to base64
                             // byte[] converted = Base64.getDecoder().decode(message);
@@ -179,8 +180,9 @@ public class MessageClient implements IMessageClient, Runnable {
                         }
                         break;
                     case CHALLENGEDONE:
-                        shell.out().println("CHALLENGEDONE: login " + config.getString("mailbox.user") + " " +
-                                config.getString("mailbox.password"));
+                        shell.out().println("CHALLENGEDONE: login " + config.getString("mailbox.user"));
+                        //shell.out().println("CHALLENGEDONE: login " + config.getString("mailbox.user") + " " +
+                                //config.getString("mailbox.password"));
                         AEScrypting AEScrypter3 = new AEScrypting(iv,secretKey);
                         writer.println(AEScrypter3.Encrypt("login " + config.getString("mailbox.user") + " " +
                                 config.getString("mailbox.password")));

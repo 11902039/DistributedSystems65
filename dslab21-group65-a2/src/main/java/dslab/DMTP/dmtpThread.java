@@ -56,7 +56,7 @@ public class dmtpThread extends Thread {
             this.parent.removeSocket(client);
             client.close();
         } catch (SocketException e) {
-            System.out.println("SocketException while handling socket: " + e.getMessage());
+            System.err.println("SocketException while handling socket: " + e.getMessage());
             return;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
